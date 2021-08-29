@@ -37,6 +37,7 @@ class TextType {
   static const String SUFIX_TAP = "SUFIX_TAP";
   static const String ON_CHANGE = "ON_CHANGE";
   static const String ON_SUBMIT = "ON_SUBMIT";
+  static const String ON_EDIT_COMPLETE = "ON_EDIT_COMPLETE";
 
   static const String FOR_PASSWORD_WITH_TWO_ICONS_AND_EYE = "FOR_PASSWORD_WITH_TWO_ICONS_AND_EYE";
   static const String WITH_PREFIX_ICON_AND_BORDER = "WITH_PREFIX_ICON_AND_BORDER";
@@ -98,6 +99,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       onFieldSubmitted: (text) {
         widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
       },
+      onEditingComplete: () {
+        widget.textFormFieldService.returnBack!(TextType.ON_EDIT_COMPLETE);
+      },
     );
   }
 
@@ -138,6 +142,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         onFieldSubmitted: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
         },
+        onEditingComplete: () {
+          widget.textFormFieldService.returnBack!(TextType.ON_EDIT_COMPLETE);
+        },
         decoration: InputDecoration(
           labelText: widget.textFormFieldService.lableText ?? "",
           hintText: widget.textFormFieldService.hintText ?? "",
@@ -170,6 +177,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         },
         onFieldSubmitted: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
+        },
+        onEditingComplete: () {
+          widget.textFormFieldService.returnBack!(TextType.ON_EDIT_COMPLETE);
         },
         decoration: InputDecoration(
           labelText: widget.textFormFieldService.lableText ?? "",
@@ -213,6 +223,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         },
         onFieldSubmitted: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
+        },
+        onEditingComplete: () {
+          widget.textFormFieldService.returnBack!(TextType.ON_EDIT_COMPLETE);
         },
         decoration: InputDecoration(
           labelText: widget.textFormFieldService.lableText ?? "",

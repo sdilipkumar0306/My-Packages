@@ -11,8 +11,13 @@ class LoginPageUI extends StatefulWidget {
   _LoginPageUIState createState() => _LoginPageUIState();
 }
 
-class _LoginPageUIState extends State<LoginPageUI> {
-  final formGlobalKey = GlobalKey<FormState>();
+class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
+  // InputValidationMixin validation = new InputValidationMixin();
+  final userGlobalKey = GlobalKey<FormState>();
+  final passwordGlobalKey = GlobalKey<FormState>();
+  final newUserGlobalKey = GlobalKey<FormState>();
+  final emailGlobalKey = GlobalKey<FormState>();
+  final newPasswordGlobalKey = GlobalKey<FormState>();
   LoginpageModal loginpageModal = new LoginpageModal();
   TextEditingController userName = new TextEditingController();
   TextEditingController password = new TextEditingController();
@@ -39,20 +44,20 @@ class _LoginPageUIState extends State<LoginPageUI> {
           child: Center(
             child: Container(
               width: 400,
-              child: Form(
-                key: formGlobalKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Login",
-                          style: GoogleFonts.pressStart2p(
-                            color: Colors.cyanAccent.shade700,
-                            fontSize: 30,
-                          )),
-                    ),
-                    CustomTextFormField(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text("Login",
+                        style: GoogleFonts.pressStart2p(
+                          color: Colors.cyanAccent.shade700,
+                          fontSize: 30,
+                        )),
+                  ),
+                  Form(
+                    key: userGlobalKey,
+                    child: CustomTextFormField(
                       textFormFieldService: TextFormFieldService(
                         textFormFields: TextFormFields(TextType.WITH_PREFIX_ICON_BG, userName),
                         lableText: "User Name",
@@ -66,20 +71,23 @@ class _LoginPageUIState extends State<LoginPageUI> {
                           if (data != null && data.trim().length != 0)
                             return null;
                           else
-                            return "Enter Data";
+                            return "Enter User Name";
                         },
                         iconBGColor: Colors.cyan.shade300,
                         returnBack: (data) {
                           if (data == TextType.ON_CHANGE) {
-                            if (formGlobalKey.currentState!.validate()) {
-                              formGlobalKey.currentState!.save();
+                            if (userGlobalKey.currentState!.validate()) {
+                              userGlobalKey.currentState!.save();
                               // use the email provided here
                             }
                           }
                         },
                       ),
                     ),
-                    CustomTextFormField(
+                  ),
+                  Form(
+                    key: passwordGlobalKey,
+                    child: CustomTextFormField(
                       textFormFieldService: TextFormFieldService(
                         textFormFields: TextFormFields(TextType.WITH_BOTH_ICONS_BG, password),
                         lableText: "Password",
@@ -100,76 +108,72 @@ class _LoginPageUIState extends State<LoginPageUI> {
                               loginpageModal.isloginPasswordVisable = !loginpageModal.isloginPasswordVisable;
                             });
                           } else if (data == TextType.ON_CHANGE) {
-                            if (formGlobalKey.currentState!.validate()) {
-                              formGlobalKey.currentState!.save();
+                            if (passwordGlobalKey.currentState!.validate()) {
+                              passwordGlobalKey.currentState!.save();
                               // use the email provided here
                             }
                           }
                         },
                         validator: (data) {
-                          if (data != null && data.trim().length != 0)
+                          if (isPasswordValid(password.text))
                             return null;
                           else
-                            return "error";
+                            return "Enter Valid password";
                         },
                         iconBGColor: Colors.cyan.shade300,
                       ),
                     ),
-                    Container(
-                      width: 150,
-                      height: 40,
-                      child: Buttons(
-                        ButtonService(
-                            buttonData: ButtonData(
-                              text: "Login",
-                              type: BtnConstants.WITHOUT_ICON,
-                              returnBack: (data) {
-                                if (data == BtnConstants.ON_TAP) {
-                                  print("login......");
-                                  if (formGlobalKey.currentState!.validate()) {
-                                    formGlobalKey.currentState!.save();
-                                    // use the email provided here
-                                  }
-                                }
-                              },
-                            ),
-                            bGColor: Colors.cyan,
-                            textColor: Colors.white,
-                            txtSize: 18,
-                            borderColor: Colors.cyan),
-                      ),
+                  ),
+                  Container(
+                    width: 150,
+                    height: 40,
+                    child: Buttons(
+                      ButtonService(
+                          buttonData: ButtonData(
+                            text: "Login",
+                            type: BtnConstants.WITHOUT_ICON,
+                            returnBack: (data) {
+                              if (data == BtnConstants.ON_TAP) {
+                                print("login......");
+                              }
+                            },
+                          ),
+                          bGColor: Colors.cyan,
+                          textColor: Colors.white,
+                          txtSize: 18,
+                          borderColor: Colors.cyan),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                                padding: EdgeInsets.all(10),
-                                child: TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        loginpageModal.isLoginPage = false;
-                                      });
-                                    },
-                                    child: Text(
-                                      "New User ?",
-                                      style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
-                                    ))),
-                            Container(
-                                padding: EdgeInsets.all(10),
-                                child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      "Forget Password.",
-                                      style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
-                                    ))),
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                              padding: EdgeInsets.all(10),
+                              child: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      loginpageModal.isLoginPage = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    "New User ?",
+                                    style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
+                                  ))),
+                          Container(
+                              padding: EdgeInsets.all(10),
+                              child: TextButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    "Forget Password.",
+                                    style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
+                                  ))),
+                        ],
+                      )
+                    ],
+                  )
+                ],
               ),
             ),
           ),
@@ -191,19 +195,20 @@ class _LoginPageUIState extends State<LoginPageUI> {
           child: Center(
             child: Container(
               width: 400,
-              child: Form(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Register",
-                          style: GoogleFonts.pressStart2p(
-                            color: Colors.cyanAccent.shade700,
-                            fontSize: 30,
-                          )),
-                    ),
-                    CustomTextFormField(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text("Register",
+                        style: GoogleFonts.pressStart2p(
+                          color: Colors.cyanAccent.shade700,
+                          fontSize: 30,
+                        )),
+                  ),
+                  Form(
+                    key: newUserGlobalKey,
+                    child: CustomTextFormField(
                       textFormFieldService: TextFormFieldService(
                         textFormFields: TextFormFields(TextType.WITH_PREFIX_ICON_BG, newUserName),
                         lableText: "User Name",
@@ -213,16 +218,27 @@ class _LoginPageUIState extends State<LoginPageUI> {
                           Icons.person,
                           color: Colors.white,
                         ),
-                        returnBack: (data) {},
-                        validator: (data) {
-                          if (data != null && data.trim().length != 0) {
-                            return "error";
+                        returnBack: (data) {
+                          if (data == TextType.ON_CHANGE) {
+                            if (newUserGlobalKey.currentState!.validate()) {
+                              newUserGlobalKey.currentState!.save();
+                              // use the email provided here
+                            }
                           }
+                        },
+                        validator: (data) {
+                          if (data != null && data.trim().length != 0)
+                            return null;
+                          else
+                            return "Enter User Name";
                         },
                         iconBGColor: Colors.cyan.shade300,
                       ),
                     ),
-                    CustomTextFormField(
+                  ),
+                  Center(
+                    key: emailGlobalKey,
+                    child: CustomTextFormField(
                       textFormFieldService: TextFormFieldService(
                         textFormFields: TextFormFields(TextType.WITH_PREFIX_ICON_BG, email),
                         lableText: " Email",
@@ -232,16 +248,27 @@ class _LoginPageUIState extends State<LoginPageUI> {
                           Icons.person,
                           color: Colors.white,
                         ),
-                        returnBack: (data) {},
-                        validator: (data) {
-                          if (data != null && data.trim().length != 0) {
-                            return "error";
+                        returnBack: (data) {
+                          if (data == TextType.ON_CHANGE) {
+                            if (emailGlobalKey.currentState!.validate()) {
+                              emailGlobalKey.currentState!.save();
+                              // use the email provided here
+                            }
                           }
+                        },
+                        validator: (data) {
+                          if (isEmailValid(data ?? email.text))
+                            return null;
+                          else
+                            "Enter Vaild Email";
                         },
                         iconBGColor: Colors.cyan.shade300,
                       ),
                     ),
-                    CustomTextFormField(
+                  ),
+                  Center(
+                    key: newPasswordGlobalKey,
+                    child: CustomTextFormField(
                       textFormFieldService: TextFormFieldService(
                         textFormFields: TextFormFields(TextType.WITH_BOTH_ICONS_BG, newPassword),
                         lableText: "Password",
@@ -256,9 +283,10 @@ class _LoginPageUIState extends State<LoginPageUI> {
                           color: Colors.white,
                         ),
                         validator: (data) {
-                          if (data != null && data.trim().length != 0) {
-                            return "error";
-                          }
+                          if (isPasswordValid(newPassword.text))
+                            return null;
+                          else
+                            return "Enter Valid password";
                         },
                         isPasswordVisable: loginpageModal.isRegisterPasswordVisable,
                         returnBack: (data) {
@@ -266,59 +294,75 @@ class _LoginPageUIState extends State<LoginPageUI> {
                             setState(() {
                               loginpageModal.isRegisterPasswordVisable = !loginpageModal.isRegisterPasswordVisable;
                             });
+                          } else if (data == TextType.ON_CHANGE) {
+                            if (newPasswordGlobalKey.currentState!.validate()) {
+                              newPasswordGlobalKey.currentState!.save();
+                              // use the email provided here
+                            }
                           }
                         },
                         iconBGColor: Colors.cyan.shade300,
                       ),
                     ),
-                    Container(
-                      width: 150,
-                      height: 40,
-                      child: Buttons(
-                        ButtonService(
-                            buttonData: ButtonData(
-                              text: "Register",
-                              type: BtnConstants.WITHOUT_ICON,
-                              returnBack: (data) {
-                                if (data == BtnConstants.ON_TAP) {
-                                  print("Register......");
-                                }
-                              },
-                            ),
-                            bGColor: Colors.cyan,
-                            textColor: Colors.white,
-                            txtSize: 18,
-                            borderColor: Colors.cyan),
-                      ),
+                  ),
+                  Container(
+                    width: 150,
+                    height: 40,
+                    child: Buttons(
+                      ButtonService(
+                          buttonData: ButtonData(
+                            text: "Register",
+                            type: BtnConstants.WITHOUT_ICON,
+                            returnBack: (data) {
+                              if (data == BtnConstants.ON_TAP) {
+                                print("Register......");
+                              }
+                            },
+                          ),
+                          bGColor: Colors.cyan,
+                          textColor: Colors.white,
+                          txtSize: 18,
+                          borderColor: Colors.cyan),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                                padding: EdgeInsets.all(10),
-                                child: TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        loginpageModal.isLoginPage = true;
-                                      });
-                                    },
-                                    child: Text(
-                                      "Alredy User ?",
-                                      style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
-                                    ))),
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                              padding: EdgeInsets.all(10),
+                              child: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      loginpageModal.isLoginPage = true;
+                                    });
+                                  },
+                                  child: Text(
+                                    "Alredy User ?",
+                                    style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
+                                  ))),
+                        ],
+                      )
+                    ],
+                  )
+                ],
               ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+mixin InputValidationMixin {
+  bool isPasswordValid(String password) => password.length >= 6;
+
+  bool isEmailValid(String email) {
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    return regex.hasMatch(email);
   }
 }
