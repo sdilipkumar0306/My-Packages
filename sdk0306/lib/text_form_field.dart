@@ -58,18 +58,6 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     switch (widget.textFormFieldService.textFormFields.textFieldType) {
-      case "FOR_PASSWORD_WITH_TWO_ICONS_AND_EYE":
-        {
-          return forPasswordWithSuffixIcon();
-        }
-      case "WITH_PREFIX_ICON_AND_BORDER":
-        {
-          return textFielsWithPreFixIconAndBorder();
-        }
-      case "WITH_SUFIX_ICON_AND_BORDER":
-        {
-          return textFielsWithSufixFixIconAndBorder();
-        }
       case "WITH_PREFIX_ICON_BG":
         {
           return withPrefixIconBg();
@@ -134,88 +122,6 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     );
   }
 
-  Widget forPasswordWithSuffixIcon() {
-    return TextFormField(
-      controller: widget.textFormFieldService.textFormFields.controller,
-      obscureText: !widget.textFormFieldService.isPasswordVisable,
-      onChanged: (text) {
-        widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
-      },
-      onFieldSubmitted: (text) {
-        widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
-      },
-      decoration: new InputDecoration(
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        labelText: widget.textFormFieldService.lableText ?? "",
-        hintText: widget.textFormFieldService.hintText ?? "",
-        fillColor: Colors.white,
-        prefixIcon: widget.textFormFieldService.prefixIcon ?? Icon(Icons.shield_sharp),
-        suffixIcon: IconButton(
-            splashRadius: 1,
-            onPressed: () {
-              widget.textFormFieldService.returnBack!(TextType.SUFIX_TAP);
-            },
-            icon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.visibility)),
-        border: new OutlineInputBorder(
-          borderRadius: new BorderRadius.circular(5.0),
-          borderSide: new BorderSide(),
-        ),
-      ),
-    );
-  }
-
-  Widget textFielsWithPreFixIconAndBorder() {
-    return TextFormField(
-        controller: widget.textFormFieldService.textFormFields.controller,
-        obscureText: !widget.textFormFieldService.isPasswordVisable,
-        onChanged: (text) {
-          widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
-        },
-        onFieldSubmitted: (text) {
-          widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
-        },
-        decoration: new InputDecoration(
-          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          labelText: widget.textFormFieldService.lableText ?? "",
-          hintText: widget.textFormFieldService.hintText ?? "",
-          fillColor: Colors.white,
-          prefixIcon: widget.textFormFieldService.prefixIcon ?? Icon(Icons.person),
-          border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(5.0),
-            borderSide: new BorderSide(),
-          ),
-        ));
-  }
-
-  Widget textFielsWithSufixFixIconAndBorder() {
-    return TextFormField(
-        controller: widget.textFormFieldService.textFormFields.controller,
-        obscureText: !widget.textFormFieldService.isPasswordVisable,
-        onChanged: (text) {
-          widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
-        },
-        onFieldSubmitted: (text) {
-          widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
-        },
-        decoration: new InputDecoration(
-          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          labelText: widget.textFormFieldService.lableText ?? "",
-          hintText: widget.textFormFieldService.hintText ?? "",
-          fillColor: Colors.white,
-          suffixIcon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.person),
-          border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(5.0),
-            borderSide: new BorderSide(),
-          ),
-        ));
-  }
-
   Widget withPrefixIconBg() {
     return TextFormField(
         controller: widget.textFormFieldService.textFormFields.controller,
@@ -277,7 +183,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                   bottomLeft: Radius.circular(5),
                   topLeft: Radius.circular(5),
                 )),
-            child: widget.textFormFieldService.sufixIcon,
+            child: IconButton(
+              splashRadius: 1,
+              onPressed: () {
+                widget.textFormFieldService.returnBack!(TextType.SUFIX_TAP);
+              },
+              icon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.visibility),
+            ),
           ),
         ));
   }
@@ -324,11 +236,12 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                   topRight: Radius.circular(5),
                 )),
             child: IconButton(
-                splashRadius: 1,
-                onPressed: () {
-                  widget.textFormFieldService.returnBack!(TextType.SUFIX_TAP);
-                },
-                icon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.visibility)),
+              splashRadius: 1,
+              onPressed: () {
+                widget.textFormFieldService.returnBack!(TextType.SUFIX_TAP);
+              },
+              icon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.visibility),
+            ),
           ),
         ));
   }
