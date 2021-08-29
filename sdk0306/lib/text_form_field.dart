@@ -7,6 +7,7 @@ class TextFormFieldService {
   Widget? prefixIcon;
   Widget? sufixIcon;
   Color borderColor;
+  Color iconBGColor;
   Function(String)? returnBack;
 
   TextFormFields textFormFields;
@@ -19,6 +20,7 @@ class TextFormFieldService {
       this.lableText,
       this.prefixIcon,
       this.sufixIcon,
+      this.iconBGColor: Colors.transparent,
       this.returnBack});
 }
 
@@ -239,7 +241,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-                color: widget.textFormFieldService.borderColor, borderRadius: BorderRadius.only(bottomLeft: Radius.circular(5), topLeft: Radius.circular(5))),
+                color: widget.textFormFieldService.iconBGColor, borderRadius: BorderRadius.only(bottomLeft: Radius.circular(5), topLeft: Radius.circular(5))),
             child: widget.textFormFieldService.prefixIcon,
           ),
         ));
@@ -270,7 +272,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-                color: widget.textFormFieldService.borderColor,
+                color: widget.textFormFieldService.iconBGColor,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(5),
                   topLeft: Radius.circular(5),
@@ -282,47 +284,52 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
 
   Widget withBothIconsWitrhBG() {
     return TextFormField(
-      controller: widget.textFormFieldService.textFormFields.controller,
-      obscureText: !widget.textFormFieldService.isPasswordVisable,
-      onChanged: (text) {
-        widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
-      },
-      onFieldSubmitted: (text) {
-        widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
-      },
-      decoration: InputDecoration(
-        labelText: widget.textFormFieldService.lableText ?? "",
-        hintText: widget.textFormFieldService.hintText ?? "",
-        fillColor: Colors.white,
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-        border: new OutlineInputBorder(
-          borderRadius: new BorderRadius.circular(5.0),
-        ),
-        prefixIcon: Container(
-            margin: EdgeInsets.only(right: 8),
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-                color: widget.textFormFieldService.borderColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(5),
-                  topLeft: Radius.circular(5),
-                )),
-            child: widget.textFormFieldService.prefixIcon),
-        suffixIcon: Container(
+        controller: widget.textFormFieldService.textFormFields.controller,
+        obscureText: !widget.textFormFieldService.isPasswordVisable,
+        onChanged: (text) {
+          widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
+        },
+        onFieldSubmitted: (text) {
+          widget.textFormFieldService.returnBack!(TextType.ON_SUBMIT);
+        },
+        decoration: InputDecoration(
+          labelText: widget.textFormFieldService.lableText ?? "",
+          hintText: widget.textFormFieldService.hintText ?? "",
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
+          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
+          disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(5.0),
+          ),
+          prefixIcon: Container(
+              margin: EdgeInsets.only(right: 8),
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                  color: widget.textFormFieldService.iconBGColor,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(5),
+                    topLeft: Radius.circular(5),
+                  )),
+              child: widget.textFormFieldService.prefixIcon),
+          suffixIcon: Container(
             margin: EdgeInsets.only(left: 8),
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-                color: widget.textFormFieldService.borderColor,
+                color: widget.textFormFieldService.iconBGColor,
                 borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(5),
                   topRight: Radius.circular(5),
                 )),
-            child: widget.textFormFieldService.sufixIcon),
-      ),
-    );
+            child: IconButton(
+                splashRadius: 1,
+                onPressed: () {
+                  widget.textFormFieldService.returnBack!(TextType.SUFIX_TAP);
+                },
+                icon: widget.textFormFieldService.sufixIcon ?? Icon(Icons.visibility)),
+          ),
+        ));
   }
 }
