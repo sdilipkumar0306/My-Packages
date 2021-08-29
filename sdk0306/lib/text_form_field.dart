@@ -116,7 +116,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
         disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
+        errorBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
         labelText: widget.textFormFieldService.lableText ?? "",
         hintText: widget.textFormFieldService.hintText ?? "",
         fillColor: Colors.white,
@@ -149,10 +149,8 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
           disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
           errorBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
-          
-        
           prefixIcon: Container(
-            margin: EdgeInsets.only(right: 8, left: 1),
+            margin: EdgeInsets.only(right: 8, left: 1, top: 1, bottom: 1),
             height: 50,
             width: 50,
             decoration: BoxDecoration(
@@ -185,7 +183,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
           errorBorder: OutlineInputBorder(borderSide: BorderSide(color: widget.textFormFieldService.borderColor)),
           suffixIcon: Container(
-            margin: EdgeInsets.only(right: 8, left: 1),
+            margin: EdgeInsets.only(right: 8, left: 1, top: 1, bottom: 1),
             height: 50,
             width: 50,
             decoration: BoxDecoration(
@@ -228,7 +226,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             borderRadius: new BorderRadius.circular(5.0),
           ),
           prefixIcon: Container(
-              margin: EdgeInsets.only(right: 8, left: 1),
+              margin: EdgeInsets.only(right: 8, left: 1, top: 1, bottom: 1),
               height: 50,
               width: 50,
               decoration: BoxDecoration(
@@ -239,7 +237,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                   )),
               child: widget.textFormFieldService.prefixIcon),
           suffixIcon: Container(
-            margin: EdgeInsets.only(left: 8,right: 1),
+            margin: EdgeInsets.only(left: 8, right: 1, top: 1, bottom: 1),
             height: 50,
             width: 50,
             decoration: BoxDecoration(
