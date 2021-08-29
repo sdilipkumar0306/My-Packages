@@ -69,7 +69,14 @@ class _LoginPageUIState extends State<LoginPageUI> {
                             return "Enter Data";
                         },
                         iconBGColor: Colors.cyan.shade300,
-                        returnBack: (data) {},
+                        returnBack: (data) {
+                          if (data == TextType.ON_CHANGE) {
+                            if (formGlobalKey.currentState!.validate()) {
+                              formGlobalKey.currentState!.save();
+                              // use the email provided here
+                            }
+                          }
+                        },
                       ),
                     ),
                     CustomTextFormField(
@@ -92,6 +99,11 @@ class _LoginPageUIState extends State<LoginPageUI> {
                             setState(() {
                               loginpageModal.isloginPasswordVisable = !loginpageModal.isloginPasswordVisable;
                             });
+                          } else if (data == TextType.ON_CHANGE) {
+                            if (formGlobalKey.currentState!.validate()) {
+                              formGlobalKey.currentState!.save();
+                              // use the email provided here
+                            }
                           }
                         },
                         validator: (data) {
