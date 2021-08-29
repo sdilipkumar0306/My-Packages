@@ -32,6 +32,7 @@ dependencies:
     git:
       url: https://github.com/sdilipkumar0306/My-Packages 
       path: sdk0306
+  google_fonts: ^2.1.0
 
 dev_dependencies:
   flutter_test:

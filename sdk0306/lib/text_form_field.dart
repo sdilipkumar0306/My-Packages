@@ -9,6 +9,7 @@ class TextFormFieldService {
   Color borderColor;
   Color iconBGColor;
   Function(String)? returnBack;
+  String? Function(String?)? validator;
 
   TextFormFields textFormFields;
 
@@ -20,6 +21,7 @@ class TextFormFieldService {
       this.lableText,
       this.prefixIcon,
       this.sufixIcon,
+      this.validator,
       this.iconBGColor: Colors.transparent,
       this.returnBack});
 }
@@ -89,6 +91,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   Widget basicTextFieldWithoutBorder() {
     return TextFormField(
       controller: widget.textFormFieldService.textFormFields.controller,
+      validator: widget.textFormFieldService.validator,
       onChanged: (text) {
         widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
       },
@@ -102,6 +105,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return TextFormField(
       controller: widget.textFormFieldService.textFormFields.controller,
       obscureText: !widget.textFormFieldService.isPasswordVisable,
+      validator: widget.textFormFieldService.validator,
       onChanged: (text) {
         widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
       },
@@ -126,6 +130,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return TextFormField(
         controller: widget.textFormFieldService.textFormFields.controller,
         obscureText: !widget.textFormFieldService.isPasswordVisable,
+        validator: widget.textFormFieldService.validator,
         onChanged: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
         },
@@ -157,6 +162,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return TextFormField(
         controller: widget.textFormFieldService.textFormFields.controller,
         obscureText: !widget.textFormFieldService.isPasswordVisable,
+        validator: widget.textFormFieldService.validator,
         onChanged: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
         },
@@ -198,6 +204,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return TextFormField(
         controller: widget.textFormFieldService.textFormFields.controller,
         obscureText: !widget.textFormFieldService.isPasswordVisable,
+        validator: widget.textFormFieldService.validator,
         onChanged: (text) {
           widget.textFormFieldService.returnBack!(TextType.ON_CHANGE);
         },
