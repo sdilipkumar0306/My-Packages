@@ -198,7 +198,7 @@ packages:
     description:
       path: sdk0306
       ref: HEAD
-      resolved-ref: acee1128303e873d470dcd59135d2c33d89dc8c8
+      resolved-ref: "444d7382fa60f01ae67259adbb628a052d85c857"
       url: "https://github.com/sdilipkumar0306/My-Packages"
     source: git
     version: "0.0.1"
