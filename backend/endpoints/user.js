@@ -3,6 +3,7 @@ var mySQL = require('../util/db_mysql_service');
 
 var method = {
     IS_USER_PRESENT: async function (event, credentials) {
+
         var reqParams = ["user_name", "password"];
         var reqparamsResponse = await getParams.GET_PARAMS(event, reqParams);
         var returnResponse ;
@@ -29,6 +30,7 @@ var method = {
         return new Promise(resolve =>{
             resolve(returnResponse);
         });
+
     },
     CREATE_USER: async function (event, credentials) {
         var reqParams = ["user_name","email", "password"];

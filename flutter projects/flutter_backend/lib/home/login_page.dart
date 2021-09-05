@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_backend/service/http_service_modal.dart';
+import 'package:flutter_backend/service/https_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sdk0306/sdk0306.dart';
 
@@ -135,6 +139,7 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                             returnBack: (data) {
                               if (data == BtnConstants.ON_TAP) {
                                 print("login......");
+                                isuserPresent();
                               }
                             },
                           ),
@@ -313,9 +318,11 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                           buttonData: ButtonData(
                             text: "Register",
                             type: BtnConstants.WITHOUT_ICON,
-                            returnBack: (data) {
+                            returnBack: (data) async {
                               if (data == BtnConstants.ON_TAP) {
                                 print("Register......");
+                                HTTPServiceModal response = await createUser();
+                                print("${response.code} ---------- ${response.msg}");
                               }
                             },
                           ),
@@ -353,6 +360,26 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
         ),
       ),
     );
+  }
+
+  Future<HTTPServiceModal> isuserPresent() async {
+    var json = {"user_name": "${userName.text}", "password": "${password.text}"};
+    HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/IS_USER_PRESENT", json);
+
+    if (response.code == 200) {
+    } else {}
+
+    return response;
+  }
+
+  Future<HTTPServiceModal> createUser() async {
+    var json = {"user_name": "${newUserName.text}", "email": "${email.text}", "password": "${newPassword.text}"};
+    HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/CREATE_USER", json);
+
+    if (response.code == 200) {
+    } else {}
+
+    return response;
   }
 }
 

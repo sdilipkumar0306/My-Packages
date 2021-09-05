@@ -14,10 +14,8 @@ exports.handler = async function (event) {
             const myHandler = require(localhandler);
             var handlerResponse = await myHandler[taskName](event, credentials);
             console.log(taskName + ' ------' + JSON.stringify(handlerResponse));
-            var response = {
-                statusCode: 200,
-                body: JSON.stringify(handlerResponse)
-            };
+            var response = 
+                JSON.stringify(handlerResponse);
             return response;
         } else {
             console.log("Insufficient Path variables : " + pathInfo.length + " - " + JSON.stringify(pathInfo));

@@ -96,7 +96,7 @@ packages:
     source: hosted
     version: "2.1.0"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -198,7 +198,7 @@ packages:
     description:
       path: sdk0306
       ref: HEAD
-      resolved-ref: f9b6685133280f8b15d1cdb750670c73780d7e29
+      resolved-ref: "7e3151360f1d66445062ac5b2a6cdb1f5f782ccb"
       url: "https://github.com/sdilipkumar0306/My-Packages"
     source: git
     version: "0.0.1"
