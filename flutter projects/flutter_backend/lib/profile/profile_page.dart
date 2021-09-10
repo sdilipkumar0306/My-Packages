@@ -72,6 +72,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                     bGColor: Colors.white,
                     textColor: Colors.black,
                     txtSize: 18,
+                    borderRadius: 5,
                     iconColor: Colors.black,
                     borderColor: Colors.black),
               ),
