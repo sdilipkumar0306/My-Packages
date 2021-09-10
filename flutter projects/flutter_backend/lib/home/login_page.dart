@@ -161,15 +161,19 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                             type: BtnConstants.WITHOUT_ICON,
                             returnBack: (data) async {
                               if (data == BtnConstants.ON_TAP) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Logging....."),duration: Duration(milliseconds: 30),));
+
                                 HTTPServiceModal response = await isuserPresent();
                                 setState(() {
                                   if (response.code == 200) {
                                     loginpageModal.loginMSG = "LOGIN SUCESSFULLY";
                                     loginpageModal.loginMSGColor = Colors.green;
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePageUI()));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePageUI()));
                                   } else {
                                     loginpageModal.loginMSG = "LOGIN FAILED";
                                     loginpageModal.loginMSGColor = Colors.red;
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to Loging???.....")));
+
                                   }
                                 });
                               }

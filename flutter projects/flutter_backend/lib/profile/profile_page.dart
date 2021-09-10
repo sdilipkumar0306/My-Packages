@@ -8,6 +8,7 @@ import 'package:flutter_backend/service/http_service_modal.dart';
 import 'package:flutter_backend/service/https_service.dart';
 import 'package:flutter_backend/util/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sdk0306/sdk0306.dart';
 
 class ProfilePageUI extends StatefulWidget {
   const ProfilePageUI({Key? key}) : super(key: key);
@@ -90,7 +91,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                   bottom: 0,
                   right: imageSize * 0.07,
                   child: Container(
-                      child: SDKImagePicker(
+                      child: ImagePickersdk(
                           circleBtn: true,
                           returnPath: (String imagePath, uint8List, fileName) async {
                             setState(() {
@@ -101,8 +102,12 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                                 userSubmittedImages = imagePath;
                               }
                             });
-                            HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Updating Profile....."),
+                              duration: Duration(milliseconds: 200),
+                            ));
                             HTTPServiceModal? dbImgResponse;
+                            HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
                             if (imgResponse.code == 200) {
                               if (imageURL == null) {
                                 dbImgResponse = await newUserProfile(imgResponse.msg);
@@ -111,7 +116,13 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                               }
                             }
                             if (dbImgResponse != null && dbImgResponse.code == 200) {
-                              imageURL = imgResponse.msg;
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("Profile Updated"),
+                                duration: Duration(milliseconds: 200),
+                              ));
+                              setState(() {
+                                imageURL = imgResponse.msg;
+                              });
                             }
                           })),
                 )
