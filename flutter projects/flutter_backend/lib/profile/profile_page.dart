@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_backend/home/login_page_modal.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sdk0306/sdk0306.dart';
 
 class ProfilePageUI extends StatefulWidget {
   const ProfilePageUI({Key? key}) : super(key: key);
@@ -58,38 +59,21 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
             Container(
               width: 200,
               height: 40,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      width: 140,
-                      padding: EdgeInsets.only(right: 10),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          btnText,
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+              child: Buttons(
+                ButtonService(
+                    buttonData: ButtonData(
+                      text: btnText,
+                      type: BtnConstants.FILE_PICKER,
+                      
+                      returnBack: (data) async {
+                        if (data == BtnConstants.ON_TAP) {}
+                      },
                     ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(
-                        Icons.upload_file,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                    )
-                  ],
-                ),
-                onPressed: () {
-          
-                },
+                    bGColor: Colors.white,
+                    textColor: Colors.black,
+                    txtSize: 18,
+                    iconColor: Colors.black,
+                    borderColor: Colors.black),
               ),
             ),
             // : DecorationImage(
@@ -100,6 +84,4 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
       ),
     );
   }
-
- 
 }

@@ -162,7 +162,7 @@ packages:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   path_provider_linux:
     dependency: transitive
     description:
@@ -224,7 +224,7 @@ packages:
     description:
       path: sdk0306
       ref: HEAD
-      resolved-ref: "7e3151360f1d66445062ac5b2a6cdb1f5f782ccb"
+      resolved-ref: c3f78d338bda1b12d7210cb6ca4315cfc4b6a995
       url: "https://github.com/sdilipkumar0306/My-Packages"
     source: git
     version: "0.0.1"
@@ -295,7 +295,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.7"
+    version: "2.2.9"
   xdg_directories:
     dependency: transitive
     description:

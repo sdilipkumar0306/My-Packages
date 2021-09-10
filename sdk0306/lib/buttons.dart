@@ -14,6 +14,7 @@ class BtnConstants {
   static const String CUSTOM_RADIUS_WITHOUT_ICON = "CUSTOM_RADIUS_WITHOUT_ICON";
   static const String CUSTOM_RADIUS_WITH_ICON = "CUSTOM_RADIUS_WITH_ICON";
   static const String BASIC_BUTTON = "BASIC_BUTTON";
+  static const String FILE_PICKER = "FILE_PICKER";
 
   static const String ON_TAP = "ON_TAP";
   static const String ON_LONG_PRESS = "ON_LONG_PRESS";
@@ -31,6 +32,8 @@ class _ButtonsState extends State<Buttons> {
         return customBtnRadiusWithoutIcons();
       case BtnConstants.CUSTOM_RADIUS_WITH_ICON:
         return customBtnRadiusWithIcons();
+      case BtnConstants.FILE_PICKER:
+        return filePickerButton();
       default:
         return basicButton();
     }
