@@ -33,12 +33,14 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
   void initState() {
     userName.text = "dilipkumar";
     password.text = "1437131415";
+    loginpageModal.loginMSG = "";
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(5),
       child: loginpageModal.isLoginPage ? loginWidget() : registerWidget(),
     );
   }
@@ -55,12 +57,13 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Center(
             child: Container(
+              padding: EdgeInsets.all(20),
               width: 400,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(10),
                     child: Text("Login",
                         style: GoogleFonts.pressStart2p(
                           color: Colors.cyanAccent.shade700,
@@ -68,78 +71,83 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                         )),
                   ),
                   Container(
-                    padding: EdgeInsets.all(10),
                     child: Text(
                       loginpageModal.loginMSG,
                       style: TextStyle(color: loginpageModal.loginMSGColor),
                     ),
                   ),
-                  Form(
-                    key: userGlobalKey,
-                    child: CustomTextFormField(
-                      textFormFieldService: TextFormFieldService(
-                        textFormFields: TextFormFields(TextType.WITH_PREFIX_ICON_BG, userName),
-                        lableText: "User Name",
-                        hintText: "Enter User Name",
-                        borderColor: Colors.cyan,
-                        prefixIcon: Icon(
-                          Icons.person,
-                          color: Colors.white,
-                        ),
-                        validator: (data) {
-                          if (data != null && data.trim().length != 0)
-                            return null;
-                          else
-                            return "Enter User Name";
-                        },
-                        iconBGColor: Colors.cyan.shade300,
-                        returnBack: (data) {
-                          if (data == TextType.ON_CHANGE) {
-                            if (userGlobalKey.currentState!.validate()) {
-                              userGlobalKey.currentState!.save();
-                              // use the email provided here
+                  Container(
+                    height: 53,
+                    child: Form(
+                      key: userGlobalKey,
+                      child: CustomTextFormField(
+                        textFormFieldService: TextFormFieldService(
+                          textFormFields: TextFormFields(TextType.WITH_PREFIX_ICON_BG, userName),
+                          lableText: "User Name",
+                          hintText: "Enter User Name",
+                          borderColor: Colors.cyan,
+                          prefixIcon: Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          validator: (data) {
+                            if (data != null && data.trim().length != 0)
+                              return null;
+                            else
+                              return "Enter User Name";
+                          },
+                          iconBGColor: Colors.cyan.shade300,
+                          returnBack: (data) {
+                            if (data == TextType.ON_CHANGE) {
+                              if (userGlobalKey.currentState!.validate()) {
+                                userGlobalKey.currentState!.save();
+                                // use the email provided here
+                              }
                             }
-                          }
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),
-                  Form(
-                    key: passwordGlobalKey,
-                    child: CustomTextFormField(
-                      textFormFieldService: TextFormFieldService(
-                        textFormFields: TextFormFields(TextType.WITH_BOTH_ICONS_BG, password),
-                        lableText: "Password",
-                        hintText: "Enter Password",
-                        borderColor: Colors.cyan,
-                        prefixIcon: Icon(
-                          Icons.security,
-                          color: Colors.white,
-                        ),
-                        sufixIcon: Icon(
-                          ((loginpageModal.isloginPasswordVisable) ? Icons.visibility : Icons.visibility_off),
-                          color: Colors.white,
-                        ),
-                        isPasswordVisable: loginpageModal.isloginPasswordVisable,
-                        returnBack: (data) {
-                          if (data == TextType.SUFIX_TAP) {
-                            setState(() {
-                              loginpageModal.isloginPasswordVisable = !loginpageModal.isloginPasswordVisable;
-                            });
-                          } else if (data == TextType.ON_CHANGE) {
-                            if (passwordGlobalKey.currentState!.validate()) {
-                              passwordGlobalKey.currentState!.save();
-                              // use the email provided here
+                  Container(
+                    height: 53,
+                    child: Form(
+                      key: passwordGlobalKey,
+                      child: CustomTextFormField(
+                        textFormFieldService: TextFormFieldService(
+                          textFormFields: TextFormFields(TextType.WITH_BOTH_ICONS_BG, password),
+                          lableText: "Password",
+                          hintText: "Enter Password",
+                          borderColor: Colors.cyan,
+                          prefixIcon: Icon(
+                            Icons.security,
+                            color: Colors.white,
+                          ),
+                          sufixIcon: Icon(
+                            ((loginpageModal.isloginPasswordVisable) ? Icons.visibility : Icons.visibility_off),
+                            color: Colors.white,
+                          ),
+                          isPasswordVisable: loginpageModal.isloginPasswordVisable,
+                          returnBack: (data) {
+                            if (data == TextType.SUFIX_TAP) {
+                              setState(() {
+                                loginpageModal.isloginPasswordVisable = !loginpageModal.isloginPasswordVisable;
+                              });
+                            } else if (data == TextType.ON_CHANGE) {
+                              if (passwordGlobalKey.currentState!.validate()) {
+                                passwordGlobalKey.currentState!.save();
+                                // use the email provided here
+                              }
                             }
-                          }
-                        },
-                        validator: (data) {
-                          if (isPasswordValid(password.text))
-                            return null;
-                          else
-                            return "Enter Valid password";
-                        },
-                        iconBGColor: Colors.cyan.shade300,
+                          },
+                          validator: (data) {
+                            if (isPasswordValid(password.text))
+                              return null;
+                            else
+                              return "Enter Valid password";
+                          },
+                          iconBGColor: Colors.cyan.shade300,
+                        ),
                       ),
                     ),
                   ),
@@ -158,7 +166,7 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                                   if (response.code == 200) {
                                     loginpageModal.loginMSG = "LOGIN SUCESSFULLY";
                                     loginpageModal.loginMSGColor = Colors.green;
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePageUI()));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePageUI()));
                                   } else {
                                     loginpageModal.loginMSG = "LOGIN FAILED";
                                     loginpageModal.loginMSGColor = Colors.red;
@@ -368,7 +376,7 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                                     });
                                   },
                                   child: Text(
-                                    "Alredy User ?",
+                                    "Already User ?",
                                     style: GoogleFonts.lusitana(color: Colors.cyan, fontSize: 18),
                                   ))),
                         ],

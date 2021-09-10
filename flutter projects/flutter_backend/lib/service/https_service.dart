@@ -1,6 +1,16 @@
 import 'dart:convert';
+// import 'dart:html';
+// import 'dart:html' as html;
+
 import 'http_service_modal.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'dart:io';
+// import 'dart:io' as io;
+// import 'package:http/http.dart' as http;
+
 // import 'dart:io' as io;
 
 class HTTPservice {
@@ -27,5 +37,29 @@ class HTTPservice {
       var error = {"code": 201, "msg": "Errorrrr"};
       return HTTPServiceModal.fromJson((error));
     }
+  }
+
+  static Future<dynamic> upload(imageFile, path) async {
+    print("aaaaaaaaaa--------- $path");
+
+    // var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var stream = new http.ByteStream.fromBytes(imageFile);
+    print("bbbbbbbbbbb--------- $stream");
+    var uploadURL = "https://api.imgbb.com/1/upload?expiration=600&key=3a64367ce812f82ed3b20d872384bf93";
+    var uri = Uri.parse(uploadURL);
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile('image', stream, 1, filename: basename(path));
+    print(multipartFile.filename);
+    print(multipartFile.field);
+    print(multipartFile. contentType);
+    //contentType: new MediaType('image', 'png'));
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value.splitMapJoin(":"));
+      // print(jsonEncode(value)[0]);
+    });
+    return response;
   }
 }

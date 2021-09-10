@@ -1,9 +1,12 @@
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_backend/home/login_page.dart';
 import 'package:flutter_backend/home/login_page_modal.dart';
+import 'package:flutter_backend/service/https_service.dart';
+import 'package:flutter_backend/util/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sdk0306/sdk0306.dart';
 
 class ProfilePageUI extends StatefulWidget {
   const ProfilePageUI({Key? key}) : super(key: key);
@@ -13,10 +16,13 @@ class ProfilePageUI extends StatefulWidget {
 }
 
 class _ProfilePageUIState extends State<ProfilePageUI> {
-  dynamic imageFileName = "";
-  String imageExtension = "";
-  String btnText = "Upload Image";
-  File? image;
+  String? userSubmittedImages;
+  String? userSubmittedExtension;
+  Uint8List? userSubmittedImagesForUint8List;
+  double imageSize = 200;
+
+  List<int> myList = List<int>.empty(growable: true);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +39,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                     LoginUserDetails.email = null;
                     LoginUserDetails.password = null;
                   });
-                  Navigator.of(context).pop();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPageUI()));
                 },
                 splashRadius: 20,
                 icon: Icon(
@@ -55,33 +61,86 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
       body: Container(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Center(
-            child: Container(
-              width: 300,
-              height: 40,
-              child: Buttons(
-                ButtonService(
-                  buttonData: ButtonData(
-                    text: btnText,
-                    type: BtnConstants.FILE_PICKER,
-                    returnBack: (data) async {
-                      if (data == BtnConstants.ON_TAP) {}
-                    },
+            child: Stack(
+              children: [
+                Container(
+                  height: imageSize,
+                  width: imageSize,
+                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.cyan)),
+                  child: ClipOval(
+                    child: (kIsWeb)
+                        ? (userSubmittedImagesForUint8List != null)
+                            ? Container(
+                                child: Image.memory(
+                                  userSubmittedImagesForUint8List!,
+                                  fit: BoxFit.contain,
+                                ),
+                              )
+                            : Center(child: Text("No Image Found"))
+                        : (userSubmittedImages != null)
+                            ? Image.file(
+                                File(userSubmittedImages!),
+                                height: 300,
+                                width: 300,
+                              )
+                            : Text("No Image Found"),
                   ),
-                  bGColor: Colors.white,
-                  textColor: Colors.black,
-                  txtSize: 18,
-                  borderRadius: 1,
-                  iconColor: Colors.black,
-                  // borderColor: Colors.black,
                 ),
-              ),
+                Positioned(
+                  bottom: 0,
+                  right: imageSize * 0.07,
+                  child: Container(
+                      child: SDKImagePicker(
+                          circleBtn: true,
+                          returnPath: (String imagePath, uint8List) {
+                            setState(() {
+                              if (kIsWeb) {
+                                userSubmittedImagesForUint8List = uint8List;
+                                userSubmittedExtension = imagePath;
+                                HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension);
+                              } else {
+                                userSubmittedImages = imagePath;
+                              }
+                            });
+                          })),
+                )
+              ],
             ),
           ),
-          // : DecorationImage(
-          //     fit: BoxFit.cover,
-          //     image: Image.memory(imagevalue).image)),
+          // Center(
+          //   child: Container(
+          //     child: SDKImagePicker(
+          //         circleBtn: true,
+          //         returnPath: (String imagePath, uint8List) {
+          //           setState(() {
+          //             if (kIsWeb) {
+          //               userSubmittedImagesForUint8List = uint8List;
+          //             } else {
+          //               userSubmittedImages = imagePath;
+          //             }
+          //           });
+          //         }),
+          //   ),
+          // ),
+          // Container(
+          //     child: (kIsWeb)
+          //         ? (userSubmittedImagesForUint8List != null)
+          //             ? Image.memory(
+          //                 userSubmittedImagesForUint8List!,
+          //                 height: 200,
+          //                 width: 200,
+          //               )
+          //             : Text("No Image Found")
+          //         : (userSubmittedImages != null)
+          //             ? Image.file(
+          //                 File(userSubmittedImages!),
+          //                 height: 200,
+          //                 width: 200,
+          //               )
+          //             : Text("No Image Found"))
         ],
       )),
     );
