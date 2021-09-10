@@ -8,7 +8,7 @@ var method = {
         var reqparamsResponse = await getParams.GET_PARAMS(event, reqParams);
         var returnResponse ;
         if(reqparamsResponse && reqparamsResponse.code && reqparamsResponse.code === 200){
-            var query = "SELECT * FROM user WHERE username = ? and password = ?";
+            var query = "SELECT user_id as USER_ID,username as USER_NAME, email as EMAIL_ID, password as PASSWORD FROM user WHERE username = ? and password = ?";
             var values = [reqparamsResponse.msg[0], reqparamsResponse.msg[1]];
             var mySQLresponse = await mySQL.executeQuery(query, values, credentials);
             if (mySQLresponse && mySQLresponse.code && mySQLresponse.code === 200) {

@@ -1,6 +1,6 @@
-import 'dart:convert';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_backend/profile/profile_page.dart';
 import 'package:flutter_backend/service/http_service_modal.dart';
 import 'package:flutter_backend/service/https_service.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,6 +28,14 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
   TextEditingController newUserName = new TextEditingController();
   TextEditingController email = new TextEditingController();
   TextEditingController newPassword = new TextEditingController();
+
+  @override
+  void initState() {
+    userName.text = "dilipkumar";
+    password.text = "1437131415";
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -58,6 +66,13 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                           color: Colors.cyanAccent.shade700,
                           fontSize: 30,
                         )),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      loginpageModal.loginMSG,
+                      style: TextStyle(color: loginpageModal.loginMSGColor),
+                    ),
                   ),
                   Form(
                     key: userGlobalKey,
@@ -136,10 +151,19 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                           buttonData: ButtonData(
                             text: "Login",
                             type: BtnConstants.WITHOUT_ICON,
-                            returnBack: (data) {
+                            returnBack: (data) async {
                               if (data == BtnConstants.ON_TAP) {
-                                print("login......");
-                                isuserPresent();
+                                HTTPServiceModal response = await isuserPresent();
+                                setState(() {
+                                  if (response.code == 200) {
+                                    loginpageModal.loginMSG = "LOGIN SUCESSFULLY";
+                                    loginpageModal.loginMSGColor = Colors.green;
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePageUI()));
+                                  } else {
+                                    loginpageModal.loginMSG = "LOGIN FAILED";
+                                    loginpageModal.loginMSGColor = Colors.red;
+                                  }
+                                });
                               }
                             },
                           ),
@@ -320,9 +344,7 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                             type: BtnConstants.WITHOUT_ICON,
                             returnBack: (data) async {
                               if (data == BtnConstants.ON_TAP) {
-                                print("Register......");
                                 HTTPServiceModal response = await createUser();
-                                print("${response.code} ---------- ${response.msg}");
                               }
                             },
                           ),
@@ -367,6 +389,11 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
     HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/IS_USER_PRESENT", json);
 
     if (response.code == 200) {
+      UserDetails userdata = UserDetails.parseResponse(response.msg);
+      LoginUserDetails.dbID = userdata.dbID;
+      LoginUserDetails.name = userdata.name;
+      LoginUserDetails.email = userdata.email;
+      LoginUserDetails.password = userdata.password;
     } else {}
 
     return response;

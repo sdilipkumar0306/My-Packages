@@ -178,6 +178,56 @@ class _ButtonsState extends State<Buttons> {
       },
     );
   }
+
+  Widget filePickerButton() {
+    return ElevatedButton(
+      style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.all<Color>(widget.buttonService.textColor),
+          backgroundColor: MaterialStateProperty.all<Color>(widget.buttonService.bGColor),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(widget.buttonService.customBorderSides!.topLeft),
+                bottomLeft: Radius.circular(widget.buttonService.customBorderSides!.bottonleft),
+                topRight: Radius.circular(widget.buttonService.customBorderSides!.topRight),
+                bottomRight: Radius.circular(widget.buttonService.customBorderSides!.bottonRight),
+              ),
+              side: BorderSide(color: widget.buttonService.borderColor),
+            ),
+          )),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            width: 140,
+            padding: EdgeInsets.only(right: 10),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                widget.buttonService.buttonData.text,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: widget.buttonService.textColor, fontSize: widget.buttonService.txtSize),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(right: 10),
+            child: Icon(
+              Icons.upload_file,
+              color: widget.buttonService.iconColor,
+              size: 25,
+            ),
+          )
+        ],
+      ),
+      onPressed: () {
+        widget.buttonService.buttonData.returnBack(BtnConstants.ON_TAP);
+      },
+      onLongPress: () {
+        widget.buttonService.buttonData.returnBack(BtnConstants.ON_LONG_PRESS);
+      },
+    );
+  }
 }
 
 class ButtonService {
