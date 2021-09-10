@@ -185,12 +185,13 @@ class _ButtonsState extends State<Buttons> {
   Widget filePickerButton() {
     return ElevatedButton(
       style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(widget.buttonService.bGColor),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(widget.buttonService.borderRadius)),
-          side: BorderSide(color: widget.buttonService.borderColor),
-        ),
-      )),
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(widget.buttonService.borderRadius)),
+              side: BorderSide(color: widget.buttonService.borderColor),
+            ),
+          )),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
