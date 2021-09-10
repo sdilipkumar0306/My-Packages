@@ -23,6 +23,13 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
   double imageSize = 200;
 
   List<int> myList = List<int>.empty(growable: true);
+  String? imageURL;
+  String localurl = "https://st2.depositphotos.com/1104517/11965/v/600/depositphotos_119659092-stock-illustration-male-avatar-profile-picture-vector.jpg";
+  @override
+  void initState() {
+    getUserProfile();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                     LoginUserDetails.name = null;
                     LoginUserDetails.email = null;
                     LoginUserDetails.password = null;
+                    imageURL = null;
                   });
                   Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPageUI()));
                 },
@@ -72,22 +80,10 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                   width: imageSize,
                   decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.cyan)),
                   child: ClipOval(
-                    child: (kIsWeb)
-                        ? (userSubmittedImagesForUint8List != null)
-                            ? Container(
-                                child: Image.memory(
-                                  userSubmittedImagesForUint8List!,
-                                  fit: BoxFit.contain,
-                                ),
-                              )
-                            : Center(child: Text("No Image Found"))
-                        : (userSubmittedImages != null)
-                            ? Image.file(
-                                File(userSubmittedImages!),
-                                height: 300,
-                                width: 300,
-                              )
-                            : Text("No Image Found"),
+                    child: Image.network(
+                      imageURL ?? localurl,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -105,10 +101,19 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                                 userSubmittedImages = imagePath;
                               }
                             });
+                            print(fileName);
                             HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
 
+                            HTTPServiceModal? dbImgResponse;
                             if (imgResponse.code == 200) {
-                              HTTPServiceModal dbImgResponse = await createUser(imgResponse.msg);
+                              if (imageURL == null) {
+                                dbImgResponse = await newUserProfile(imgResponse.msg);
+                              } else {
+                                dbImgResponse = await updateUserProfile(imgResponse.msg);
+                              }
+                            }
+                            if (dbImgResponse != null && dbImgResponse.code == 200) {
+                              getUserProfile();
                             }
                           })),
                 )
@@ -151,13 +156,37 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
     );
   }
 
-  Future<HTTPServiceModal> createUser(url) async {
+  Future<HTTPServiceModal> newUserProfile(url) async {
     var json = {"user_id": "${LoginUserDetails.dbID}", "image_url": "$url"};
-    print(json);
     HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/UPLOAD_USER_PROFILE_IMAGE", json);
 
     if (response.code == 200) {
     } else {}
+
+    return response;
+  }
+
+  Future<HTTPServiceModal> updateUserProfile(url) async {
+    var json = {"user_id": "${LoginUserDetails.dbID}", "image_url": "$url"};
+    HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/UPDATE_USER_PROFILE_IMAGE", json);
+
+    if (response.code == 200) {
+    } else {}
+
+    return response;
+  }
+
+  Future<HTTPServiceModal> getUserProfile() async {
+    var json = {"user_id": "${LoginUserDetails.dbID}"};
+    HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/GET_USER_PROFILE_IMAGE", json);
+
+    if (response.code == 200) {
+      setState(() {
+        imageURL = response.msg[0]["IMAGE_URL"];
+      });
+    } else {
+      imageURL = null;
+    }
 
     return response;
   }
