@@ -196,6 +196,7 @@ class _ButtonsState extends State<Buttons> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Container(
+            alignment:Alignment.center,
             width: 140,
             padding: EdgeInsets.only(right: 10),
             child: SingleChildScrollView(
@@ -244,7 +245,7 @@ class ButtonService {
     this.txtSize: 18,
     this.textColor: Colors.transparent,
     this.bGColor: Colors.transparent,
-    this.borderColor: Colors.transparent,
+    this.borderColor: Colors.white,
     this.iconColor: Colors.transparent,
     this.sufixIcon,
     this.customBorderSides,
