@@ -242,10 +242,10 @@ class ButtonService {
     required this.buttonData,
     this.borderRadius: 5,
     this.txtSize: 18,
-    this.textColor: Colors.black,
+    this.textColor: Colors.transparent,
     this.bGColor: Colors.transparent,
-    this.borderColor: Colors.black,
-    this.iconColor: Colors.black,
+    this.borderColor: Colors.transparent,
+    this.iconColor: Colors.transparent,
     this.sufixIcon,
     this.customBorderSides,
   });

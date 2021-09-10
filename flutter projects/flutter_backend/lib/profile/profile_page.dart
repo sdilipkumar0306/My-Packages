@@ -53,36 +53,37 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
         ),
       ),
       body: Container(
-        child: Center(
-            child: Column(
-          children: [
-            Container(
-              width: 200,
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(
+              width: 300,
               height: 40,
               child: Buttons(
                 ButtonService(
-                    buttonData: ButtonData(
-                      text: btnText,
-                      type: BtnConstants.FILE_PICKER,
-                      
-                      returnBack: (data) async {
-                        if (data == BtnConstants.ON_TAP) {}
-                      },
-                    ),
-                    bGColor: Colors.white,
-                    textColor: Colors.black,
-                    txtSize: 18,
-                    borderRadius: 5,
-                    iconColor: Colors.black,
-                    borderColor: Colors.black),
+                  buttonData: ButtonData(
+                    text: btnText,
+                    type: BtnConstants.FILE_PICKER,
+                    returnBack: (data) async {
+                      if (data == BtnConstants.ON_TAP) {}
+                    },
+                  ),
+                  bGColor: Colors.white,
+                  textColor: Colors.black,
+                  txtSize: 18,
+                  borderRadius: 1,
+                  iconColor: Colors.black,
+                  // borderColor: Colors.black,
+                ),
               ),
             ),
-            // : DecorationImage(
-            //     fit: BoxFit.cover,
-            //     image: Image.memory(imagevalue).image)),
-          ],
-        )),
-      ),
+          ),
+          // : DecorationImage(
+          //     fit: BoxFit.cover,
+          //     image: Image.memory(imagevalue).image)),
+        ],
+      )),
     );
   }
 }
