@@ -10,7 +10,7 @@ import 'dart:async';
 
 class SDKImagePicker extends StatefulWidget {
   final String btnText;
-  final Function(String, dynamic)? returnPath;
+  final Function(String, dynamic, String)? returnPath;
   final bool? isFirstTime;
   final bool circleBtn;
 
@@ -28,6 +28,7 @@ class SDKImagePickerSelectioState extends State<SDKImagePicker> {
 
   PickedFile? _imageFile;
   String? status;
+  String? pickedFileName;
   bool? imgLoading;
   ImagePicker? imagePicker;
 
@@ -44,15 +45,18 @@ class SDKImagePickerSelectioState extends State<SDKImagePicker> {
           alignment: Alignment.center,
           child: (widget.circleBtn)
               ? Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.cyan),
-                child: IconButton(
-                  splashRadius: 20,
-                  color: Colors.white,
-                    onPressed: () {
-                      (kIsWeb) ? chooseFileForWeb() : chooseFileForAndroid();
-                    },
-                    icon: Icon(Icons.photo_camera,size: 20,)),
-              )
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.cyan),
+                  child: IconButton(
+                      splashRadius: 20,
+                      color: Colors.white,
+                      onPressed: () {
+                        (kIsWeb) ? chooseFileForWeb() : chooseFileForAndroid();
+                      },
+                      icon: Icon(
+                        Icons.photo_camera,
+                        size: 20,
+                      )),
+                )
               : ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(primary: Colors.orange),
                   icon: Icon(Icons.image),
@@ -86,7 +90,7 @@ class SDKImagePickerSelectioState extends State<SDKImagePicker> {
                 if (null != file) {
                   setState(() {
                     _imageFile = file;
-                    widget.returnPath!(_imageFile?.path ?? "", "");
+                    widget.returnPath!(_imageFile?.path ?? "", "", pickedFileName ?? "");
                     imgLoading = false;
                   });
                   return;
@@ -111,14 +115,11 @@ class SDKImagePickerSelectioState extends State<SDKImagePicker> {
 
   Future<PickedFile?> _loadImage(ImageSource imageSource) async {
     PickedFile? file = await imagePicker?.getImage(source: imageSource);
-    if (null != file) {
-      print("PATH");
-    }
+    if (null != file) {}
     return file;
   }
 
   void chooseFileForWeb() {
-    print("Choose Web Picker");
     html.InputElement? uploadInput = html.FileUploadInputElement() as html.InputElement?;
     uploadInput?.click();
 
@@ -126,11 +127,12 @@ class SDKImagePickerSelectioState extends State<SDKImagePicker> {
       final files = uploadInput.files;
       final file = files?.elementAt(0);
       final fileName = files?.elementAt(0).name;
+      pickedFileName = fileName;
       int lastDot = fileName!.lastIndexOf('.');
       String ext = fileName.substring(lastDot + 1);
       final html.FileReader reader = new html.FileReader();
       reader.onLoad.listen((e) {
-        widget.returnPath!(ext, reader.result);
+        widget.returnPath!(ext, reader.result, pickedFileName ?? "");
       });
       reader.readAsArrayBuffer(file!);
     });

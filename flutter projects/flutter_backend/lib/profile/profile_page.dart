@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_backend/home/login_page.dart';
 import 'package:flutter_backend/home/login_page_modal.dart';
+import 'package:flutter_backend/service/http_service_modal.dart';
 import 'package:flutter_backend/service/https_service.dart';
 import 'package:flutter_backend/util/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -95,16 +96,20 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                   child: Container(
                       child: SDKImagePicker(
                           circleBtn: true,
-                          returnPath: (String imagePath, uint8List) {
+                          returnPath: (String imagePath, uint8List, fileName) async {
                             setState(() {
                               if (kIsWeb) {
                                 userSubmittedImagesForUint8List = uint8List;
                                 userSubmittedExtension = imagePath;
-                                HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension);
                               } else {
                                 userSubmittedImages = imagePath;
                               }
                             });
+                            HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
+
+                            if (imgResponse.code == 200) {
+                              HTTPServiceModal dbImgResponse = await createUser(imgResponse.msg);
+                            }
                           })),
                 )
               ],
@@ -144,5 +149,16 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
         ],
       )),
     );
+  }
+
+  Future<HTTPServiceModal> createUser(url) async {
+    var json = {"user_id": "${LoginUserDetails.dbID}", "image_url": "$url"};
+    print(json);
+    HTTPServiceModal response = await HTTPservice.postCallWithAuth("user/UPLOAD_USER_PROFILE_IMAGE", json);
+
+    if (response.code == 200) {
+    } else {}
+
+    return response;
   }
 }

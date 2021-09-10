@@ -26,6 +26,7 @@ class HTTPservice {
       var headers = {"Accept": "application/json"};
       var response = await http.post(finalUrl, headers: headers, body: reqBody);
       var responsBody = json.decode(response.body);
+      print(responsBody);
       if (responsBody["code"] == 200) {
         return HTTPServiceModal.fromJson(jsonDecode(response.body));
       } else {
@@ -39,27 +40,24 @@ class HTTPservice {
     }
   }
 
-  static Future<dynamic> upload(imageFile, path) async {
-    print("aaaaaaaaaa--------- $path");
-
-    // var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+  static Future<HTTPServiceModal> upload(imageFile, path, String fileName) async {
+    String responseIMGurl = "";
     var stream = new http.ByteStream.fromBytes(imageFile);
-    print("bbbbbbbbbbb--------- $stream");
     var uploadURL = "https://api.imgbb.com/1/upload?expiration=600&key=3a64367ce812f82ed3b20d872384bf93";
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
-    var multipartFile = new http.MultipartFile('image', stream, 1, filename: basename(path));
-    print(multipartFile.filename);
-    print(multipartFile.field);
-    print(multipartFile. contentType);
-    //contentType: new MediaType('image', 'png'));
+    var multipartFile = new http.MultipartFile('image', stream, 1, filename: fileName.split(".")[0]);
     request.files.add(multipartFile);
     var response = await request.send();
     print(response.statusCode);
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value.splitMapJoin(":"));
-      // print(jsonEncode(value)[0]);
+    await response.stream.transform(utf8.decoder).listen((value) {
+      responseIMGurl = (json.decode(value)["data"]["url"]);
     });
-    return response;
+    print("urllllllllllllll------------- $responseIMGurl");
+    if (responseIMGurl == "") {
+      return HTTPServiceModal.fromJson({"code": response.statusCode, "msg": responseIMGurl});
+    } else {
+      return HTTPServiceModal.fromJson({"code": response.statusCode, "msg": responseIMGurl});
+    }
   }
 }
