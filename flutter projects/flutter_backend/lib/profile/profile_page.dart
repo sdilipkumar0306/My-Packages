@@ -101,9 +101,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                                 userSubmittedImages = imagePath;
                               }
                             });
-                            print(fileName);
                             HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
-
                             HTTPServiceModal? dbImgResponse;
                             if (imgResponse.code == 200) {
                               if (imageURL == null) {
@@ -113,7 +111,7 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
                               }
                             }
                             if (dbImgResponse != null && dbImgResponse.code == 200) {
-                              getUserProfile();
+                              imageURL = imgResponse.msg;
                             }
                           })),
                 )
