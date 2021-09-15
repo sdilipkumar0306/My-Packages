@@ -35,33 +35,13 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: NavDrawer(),
       appBar: AppBar(
+        toolbarHeight: 50,
         backgroundColor: Colors.cyan,
-        actions: [
-          Container(
-            padding: EdgeInsets.only(right: 30),
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    LoginUserDetails.dbID = null;
-                    LoginUserDetails.name = null;
-                    LoginUserDetails.email = null;
-                    LoginUserDetails.password = null;
-                    imageURL = null;
-                  });
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPageUI()));
-                },
-                splashRadius: 20,
-                icon: Icon(
-                  Icons.logout,
-                  color: Colors.white,
-                )),
-          )
-        ],
         automaticallyImplyLeading: false,
         title: Center(
           child: Text(
-            // "${LoginUserDetails.name?.toUpperCase()}",
             "Profile",
             style: GoogleFonts.ultra(color: Colors.white, fontSize: 30),
             textAlign: TextAlign.center,
@@ -70,98 +50,120 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
       ),
       body: Container(
           child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        // mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(
-            child: Stack(
-              children: [
-                Container(
-                  height: imageSize,
-                  width: imageSize,
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.cyan)),
-                  child: ClipOval(
-                    child: Image.network(
-                      imageURL ?? localurl,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: imageSize * 0.07,
-                  child: Container(
-                      child: ImagePickersdk(
-                          circleBtn: true,
-                          returnPath: (String imagePath, uint8List, fileName) async {
-                            setState(() {
-                              if (kIsWeb) {
-                                userSubmittedImagesForUint8List = uint8List;
-                                userSubmittedExtension = imagePath;
-                              } else {
-                                userSubmittedImages = imagePath;
-                              }
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Updating Profile....."),
-                              duration: Duration(milliseconds: 200),
-                            ));
-                            HTTPServiceModal? dbImgResponse;
-                            HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
-                            if (imgResponse.code == 200) {
-                              if (imageURL == null) {
-                                dbImgResponse = await newUserProfile(imgResponse.msg);
-                              } else {
-                                dbImgResponse = await updateUserProfile(imgResponse.msg);
-                              }
-                            }
-                            if (dbImgResponse != null && dbImgResponse.code == 200) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Profile Updated"),
-                                duration: Duration(milliseconds: 200),
-                              ));
-                              setState(() {
-                                imageURL = imgResponse.msg;
-                              });
-                            }
-                          })),
-                )
-              ],
-            ),
-          ),
-          // Center(
-          //   child: Container(
-          //     child: SDKImagePicker(
-          //         circleBtn: true,
-          //         returnPath: (String imagePath, uint8List) {
-          //           setState(() {
-          //             if (kIsWeb) {
-          //               userSubmittedImagesForUint8List = uint8List;
-          //             } else {
-          //               userSubmittedImages = imagePath;
-          //             }
-          //           });
-          //         }),
-          //   ),
-          // ),
-          // Container(
-          //     child: (kIsWeb)
-          //         ? (userSubmittedImagesForUint8List != null)
-          //             ? Image.memory(
-          //                 userSubmittedImagesForUint8List!,
-          //                 height: 200,
-          //                 width: 200,
-          //               )
-          //             : Text("No Image Found")
-          //         : (userSubmittedImages != null)
-          //             ? Image.file(
-          //                 File(userSubmittedImages!),
-          //                 height: 200,
-          //                 width: 200,
-          //               )
-          //             : Text("No Image Found"))
+          Container(child: imageDisplay()),
+          Container(child: profileDetails()),
         ],
       )),
+    );
+  }
+
+  Widget imageDisplay() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Stack(
+        children: [
+          Container(
+            height: imageSize,
+            width: imageSize,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.cyan)),
+            child: ClipOval(
+              child: Image.network(
+                imageURL ?? localurl,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: imageSize * 0.07,
+            child: Container(
+                child: ImagePickersdk(
+                    circleBtn: true,
+                    returnPath: (String imagePath, uint8List, fileName) async {
+                      setState(() {
+                        if (kIsWeb) {
+                          userSubmittedImagesForUint8List = uint8List;
+                          userSubmittedExtension = imagePath;
+                        } else {
+                          userSubmittedImages = imagePath;
+                        }
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Updating Profile....."),
+                        duration: Duration(milliseconds: 200),
+                        dismissDirection: DismissDirection.endToStart,
+                      ));
+                      HTTPServiceModal? dbImgResponse;
+                      HTTPServiceModal imgResponse = await HTTPservice.upload(userSubmittedImagesForUint8List, userSubmittedExtension, fileName);
+                      if (imgResponse.code == 200) {
+                        if (imageURL == null) {
+                          dbImgResponse = await newUserProfile(imgResponse.msg);
+                        } else {
+                          dbImgResponse = await updateUserProfile(imgResponse.msg);
+                        }
+                      }
+                      if (dbImgResponse != null && dbImgResponse.code == 200) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Profile Updated"),
+                          duration: Duration(milliseconds: 200),
+                          dismissDirection: DismissDirection.up,
+                        ));
+                        setState(() {
+                          imageURL = imgResponse.msg;
+                        });
+                      }
+                    })),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget profileDetails() {
+    return Container(
+      padding: EdgeInsets.all(15),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("Name :", style: GoogleFonts.abrilFatface(color: Colors.black, fontSize: 30)),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("${LoginUserDetails.name}",
+                          style: GoogleFonts.playball(fontSize: 25, wordSpacing: 9, color: Colors.black, fontWeight: FontWeight.bold)))
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("Email :", style: GoogleFonts.abrilFatface(color: Colors.black, fontSize: 30)),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("${LoginUserDetails.email}",
+                          style: GoogleFonts.playball(fontSize: 25, wordSpacing: 9, color: Colors.black, fontWeight: FontWeight.bold)))
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -198,5 +200,55 @@ class _ProfilePageUIState extends State<ProfilePageUI> {
     }
 
     return response;
+  }
+}
+
+class NavDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Text(
+              'Side menu',
+              style: TextStyle(color: Colors.cyan, fontSize: 25),
+            ),
+          ),
+          ListTile(
+            leading: Icon(Icons.input),
+            title: Text('Welcome'),
+            onTap: () => {},
+          ),
+          ListTile(
+            leading: Icon(Icons.verified_user),
+            title: Text('Profile'),
+            onTap: () => {Navigator.of(context).pop()},
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('Settings'),
+            onTap: () => {Navigator.of(context).pop()},
+          ),
+          ListTile(
+            leading: Icon(Icons.border_color),
+            title: Text('Feedback'),
+            onTap: () => {Navigator.of(context).pop()},
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () {
+              LoginUserDetails.dbID = null;
+              LoginUserDetails.name = null;
+              LoginUserDetails.email = null;
+              LoginUserDetails.password = null;
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPageUI()));
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
