@@ -1,0 +1,66 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart"
+        },
+        {
+            "name": "my_todo",
+            "cwd": "my_todo",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "my_todo (profile mode)",
+            "cwd": "my_todo",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "sdk0306",
+            "cwd": "sdk0306",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "sdk0306 (profile mode)",
+            "cwd": "sdk0306",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "flutter_backend",
+            "cwd": "flutter projects\\flutter_backend",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "flutter_backend (profile mode)",
+            "cwd": "flutter projects\\flutter_backend",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "praitcing",
+            "cwd": "flutter projects\\praitcing",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "praitcing (profile mode)",
+            "cwd": "flutter projects\\praitcing",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        }
+    ]
+}
