@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
-
+import 'package:our_zone/services/auth_services.dart';
 import 'package:our_zone/util/constants.dart';
 import 'package:our_zone/util/images_display.dart';
 
-class LoginRegister extends StatefulWidget {
-  const LoginRegister({Key? key}) : super(key: key);
+import 'login_register.dart';
+
+class RegisterPage extends StatefulWidget {
+  final Function changePage;
+  const RegisterPage({required this.changePage, Key? key}) : super(key: key);
 
   @override
-  _LoginRegisterState createState() => _LoginRegisterState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginRegisterState extends State<LoginRegister>
-    with SingleTickerProviderStateMixin {
+class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
   late Animation<double> _transform;
   bool visableIcons = true;
+
+  TextEditingController username = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -39,7 +45,7 @@ class _LoginRegisterState extends State<LoginRegister>
     _transform = Tween<double>(begin: 2, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.fastLinearToSlowEaseIn,
+        curve: Curves.easeOutBack,
       ),
     );
 
@@ -57,11 +63,6 @@ class _LoginRegisterState extends State<LoginRegister>
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: ScrollConfiguration(
         behavior: MyBehavior(),
         child: SingleChildScrollView(
@@ -85,7 +86,7 @@ class _LoginRegisterState extends State<LoginRegister>
                   scale: _transform.value,
                   child: Container(
                     width: size.width * .9,
-                    height: size.height * 0.6,
+                    height: size.height * 0.65,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(15),
@@ -115,9 +116,9 @@ class _LoginRegisterState extends State<LoginRegister>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              const SizedBox(),
+                              const SizedBox(height: 20),
                               Text(
-                                'Sign In',
+                                'Sign Up',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -125,48 +126,40 @@ class _LoginRegisterState extends State<LoginRegister>
                                 ),
                               ),
                               const SizedBox(),
-                              textFields(Icons.account_circle_outlined,
-                                  'User name...', false, false),
-                              textFields(Icons.email_outlined, 'Email...',
-                                  false, true),
-                              textFields(Icons.lock_outline, 'Password...',
-                                  true, false),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  component2(
-                                    'LOGIN',
-                                    2.6,
-                                    () {
-                                      HapticFeedback.lightImpact();
-                                    },
-                                  ),
-                                  SizedBox(width: size.width / 25),
-                                  Container(
-                                    width: size.width / 2.6,
-                                    alignment: Alignment.center,
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: 'Forgotten password!',
-                                        style: const TextStyle(
-                                            color: Colors.blueAccent),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {},
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                              textFields(Icons.account_circle_outlined, 'User name...', false, false, username),
+                              textFields(Icons.email_outlined, 'Email...', false, true, email),
+                              textFields(Icons.lock_outline, 'Password...', true, false, password),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    User result = await authService.signUpWithEmailAndPassword(email.text, password.text);
+
+                                    print(" resulttt --- ${result.uid}");
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    child: Text("Sign Up", style: TextStyle(color: Colors.white)),
+                                  )),
                               const SizedBox(),
-                              RichText(
-                                text: TextSpan(
-                                  text: 'Create a new Account',
-                                  style: const TextStyle(
-                                    color: Colors.blueAccent,
-                                    fontSize: 15,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {},
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    const Text("Alredy have an Account?"),
+                                    const SizedBox(),
+                                    TextButton(
+                                        style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                            splashFactory: NoSplash.splashFactory,
+                                            overlayColor: MaterialStateProperty.all(Colors.transparent)),
+                                        onPressed: () {
+                                          widget.changePage();
+                                        },
+                                        child: const Text(
+                                          'Login',
+                                          style: TextStyle(color: Colors.blueAccent),
+                                        )),
+                                  ],
                                 ),
                               ),
                               const SizedBox(),
@@ -178,10 +171,11 @@ class _LoginRegisterState extends State<LoginRegister>
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 2000),
                             curve: Curves.fastLinearToSlowEaseIn,
-                            child: const AssetCircularImage(
-                                height: 100,
-                                width: 100,
-                                imagePath: UiConstants.logopath),
+                            child: const Card(
+                              child: AssetCircularImage(height: 100, width: 100, imagePath: UiConstants.logopath),
+                              elevation: 15,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100.0))),
+                            ),
                           ),
                         )
                       ],
@@ -196,8 +190,7 @@ class _LoginRegisterState extends State<LoginRegister>
     );
   }
 
-  Widget textFields(
-      IconData icon, String hintText, bool isPassword, bool isEmail) {
+  Widget textFields(IconData icon, String hintText, bool isPassword, bool isEmail, TextEditingController controller) {
     Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -209,7 +202,8 @@ class _LoginRegisterState extends State<LoginRegister>
         color: Colors.black.withOpacity(.05),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: TextField(
+      child: TextFormField(
+        controller: controller,
         style: TextStyle(color: Colors.black.withOpacity(.8)),
         obscureText: (isPassword) ? visableIcons : isPassword,
         keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
@@ -233,44 +227,9 @@ class _LoginRegisterState extends State<LoginRegister>
               : null,
           hintMaxLines: 1,
           hintText: hintText,
-          hintStyle:
-              TextStyle(fontSize: 14, color: Colors.black.withOpacity(.5)),
+          hintStyle: TextStyle(fontSize: 14, color: Colors.black.withOpacity(.5)),
         ),
       ),
     );
-  }
-
-  Widget component2(String string, double width, VoidCallback voidCallback) {
-    Size size = MediaQuery.of(context).size;
-    return InkWell(
-      highlightColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      onTap: voidCallback,
-      child: Container(
-        height: size.width / 8,
-        width: size.width / width,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: const Color(0xff4796ff),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          string,
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
-
-class MyBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-    BuildContext context,
-    Widget child,
-    AxisDirection axisDirection,
-  ) {
-    return child;
   }
 }

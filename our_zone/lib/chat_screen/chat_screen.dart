@@ -137,9 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Text(
                       message,
-                      // maxLines: 10,
                       softWrap: true,
-                      // overflow: TextOverflow.fade,
                     ),
                     Align(
                         alignment: Alignment.bottomRight,
@@ -191,9 +189,45 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   message,
-                  // maxLines: 10,
                   softWrap: true,
-                  // overflow: TextOverflow.fade,
+                ),
+                Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                          DateTimeConversion().timeConversion(TimeOfDay.now())),
+                    ))
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget msgBox(String type) {
+    return Container(
+      margin:  (type == "SEND") ?  const EdgeInsets.only(left: 60, top: 5, bottom: 5) : const EdgeInsets.only(right: 60, top: 5, bottom: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: AssetCircularImage(
+                height: 40, width: 40, imagePath: UiConstants.logopath),
+          ),
+          const SizedBox(width: 5),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.6,
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.white),
+            child: Column(
+              children: [
+                Text(
+                  message,
+                  softWrap: true,
                 ),
                 Align(
                     alignment: Alignment.bottomRight,

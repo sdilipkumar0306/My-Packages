@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:our_zone/chat_screen/chat_screen.dart';
-import 'package:our_zone/login_page/login_register.dart';
+import 'package:our_zone/login_Register/login_register.dart';
 import 'package:our_zone/util/constants.dart';
 import 'package:our_zone/util/images_display.dart';
 
@@ -12,8 +11,7 @@ class MyCustomSplashScreen extends StatefulWidget {
   _MyCustomSplashScreenState createState() => _MyCustomSplashScreenState();
 }
 
-class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
-    with TickerProviderStateMixin {
+class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with TickerProviderStateMixin {
   double _fontSize = 2;
   double _containerSize = 1.5;
   double _textOpacity = 0.0;
@@ -26,11 +24,9 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
   void initState() {
     super.initState();
 
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3));
 
-    animation1 = Tween<double>(begin: 40, end: 20).animate(CurvedAnimation(
-        parent: _controller, curve: Curves.fastLinearToSlowEaseIn))
+    animation1 = Tween<double>(begin: 40, end: 20).animate(CurvedAnimation(parent: _controller, curve: Curves.fastLinearToSlowEaseIn))
       ..addListener(() {
         setState(() {
           _textOpacity = 1.0;
@@ -54,7 +50,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
 
     Timer(const Duration(seconds: 4), () {
       setState(() {
-        Navigator.pushReplacement(context, PageTransition(const ChatScreen()));
+        Navigator.pushReplacement(context, PageTransition(const LoginRegister()));
       });
     });
   }
@@ -76,10 +72,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
         children: [
           Column(
             children: [
-              AnimatedContainer(
-                  duration: const Duration(milliseconds: 2000),
-                  curve: Curves.fastLinearToSlowEaseIn,
-                  height: _height / _fontSize),
+              AnimatedContainer(duration: const Duration(milliseconds: 2000), curve: Curves.fastLinearToSlowEaseIn, height: _height / _fontSize),
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 1000),
                 opacity: _textOpacity,
@@ -104,10 +97,8 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
                   curve: Curves.fastLinearToSlowEaseIn,
                   height: (_width / _containerSize) - 3,
                   width: (_width / _containerSize) - 3,
-                  child: AssetCircularImage(
-                      height: (_width / _containerSize) - 3,
-                      width: (_width / _containerSize) - 3,
-                      imagePath: UiConstants.logopath)),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                  child: AssetCircularImage(height: (_width / _containerSize) - 3, width: (_width / _containerSize) - 3, imagePath: UiConstants.logopath)),
             ),
           ),
         ],
