@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dart",
-            "type": "dart",
+            "name": "our_zone",
+            "cwd": "our_zone",
             "request": "launch",
-            "program": "bin/main.dart"
+            "type": "dart"
         },
         {
             "name": "my_todo",

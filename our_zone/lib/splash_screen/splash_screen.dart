@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:our_zone/home/home_page.dart';
 import 'package:our_zone/login_Register/login_register.dart';
 import 'package:our_zone/util/constants.dart';
 import 'package:our_zone/util/images_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyCustomSplashScreen extends StatefulWidget {
   const MyCustomSplashScreen({Key? key}) : super(key: key);
@@ -19,9 +21,12 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
 
   late AnimationController _controller;
   late Animation<double> animation1;
+  bool gotologinRegister = true;
+  String? uid;
 
   @override
   void initState() {
+    nextPage();
     super.initState();
 
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3));
@@ -50,7 +55,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
 
     Timer(const Duration(seconds: 4), () {
       setState(() {
-        Navigator.pushReplacement(context, PageTransition(const LoginRegister()));
+        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : MyCustomUI(uid)));
       });
     });
   }
@@ -59,6 +64,18 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> nextPage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    uid = prefs.getString("user_login_id");
+
+    if (uid != null) {
+      gotologinRegister = false;
+    } else {
+      gotologinRegister = true;
+    }
   }
 
   @override
