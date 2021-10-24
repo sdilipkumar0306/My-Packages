@@ -24,6 +24,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late Animation<double> _transform;
   bool visableIcons = true;
   bool isloginClicked = false;
+  bool enableLoginButton = true;
   String? emmailError;
   String? passwoedError;
 
@@ -170,35 +171,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     ElevatedButton(
-                                        onPressed: () async {
-                                          CommonService.closeKeyboard(context);
-                                          setState(() {
-                                            isloginClicked = true;
-                                            emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
-                                            passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
-                                          });
-                                          if (isEmailValid(email.text) && isPasswordValid(password.text)) {
-                                            print("login");
-                                            User? result = await authservice.signInWithEmailAndPassword(email.text, password.text);
-
-                                            if (result != null) {
-                                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                                              prefs.setString("user_login_id", result.uid);
-                                              String? uid = result.uid;
-                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyCustomUI(uid)));
-                                            } else {
-                                              setState(() {
-                                                passwoedError = "Enter valid Email/Password";
-                                              });
-                                            }
-                                            print(" resulttt --- ${result == null}");
-                                            print(" resulttt --- ${result?.uid}");
-                                          }
-                                        },
-                                        child: const Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: 20),
-                                          child: Text("Login", style: TextStyle(color: Colors.white)),
-                                        )),
+                                      onPressed: () async {
+                                        if (enableLoginButton) {
+                                          logincall();
+                                        }
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 20),
+                                        child: Text("Login", style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ),
                                     SizedBox(width: size.width / 25),
                                     Container(
                                       width: size.width / 2.6,
@@ -208,9 +190,21 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                               splashFactory: NoSplash.splashFactory,
                                               overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            setState(() {
+                                              emmailError = null;
+                                            });
+                                            if (isEmailValid(email.text)) {
+                                              authservice.resetPass(email.text);
+                                              CommonService.snackbar(context, "Email sent to registerd Email Id", showLoader: false);
+                                            } else {
+                                              setState(() {
+                                                emmailError = "Enter Email";
+                                              });
+                                            }
+                                          },
                                           child: const Text(
-                                            'Forgotten password!',
+                                            'Forget password!',
                                             style: TextStyle(color: Colors.blueAccent),
                                           )),
                                     )
@@ -323,5 +317,38 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         )
       ],
     );
+  }
+
+  Future<void> logincall() async {
+    CommonService.closeKeyboard(context);
+    setState(() {
+      isloginClicked = true;
+      emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
+      passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
+    });
+    if (isEmailValid(email.text) && isPasswordValid(password.text)) {
+      setState(() {
+        enableLoginButton = false;
+      });
+      CommonService.snackbar(context, "Loading Please wait....");
+
+      User? result = await authservice.signInWithEmailAndPassword(email.text, password.text);
+
+      if (result != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("user_login_id", result.uid);
+        prefs.setString("user_email", email.text);
+
+        CommonService.hideSnackbar(context);
+
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyCustomUI()));
+      } else {
+        CommonService.hideSnackbar(context);
+        setState(() {
+          passwoedError = "Enter valid Email/Password";
+          enableLoginButton = true;
+        });
+      }
+    }
   }
 }

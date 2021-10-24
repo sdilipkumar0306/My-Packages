@@ -9,7 +9,7 @@ class DatabaseMethods {
     });
   }
 
-  getUserInfo(String email) async {
+Future<QuerySnapshot<Object?>>  getUserInfo(String email) async {
     return FirebaseFirestore.instance.collection("users").where("userEmail", isEqualTo: email).get().catchError((e) {
       print(e.toString());
     });

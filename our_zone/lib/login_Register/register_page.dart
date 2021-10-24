@@ -23,6 +23,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   late Animation<double> _transform;
   bool visableIcons = true;
   bool isloginClicked = false;
+  bool enablesigninbutton = true;
   String? usernameError;
   String? emmailError;
   String? passwoedError;
@@ -181,36 +182,8 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                     }),
                                 ElevatedButton(
                                     onPressed: () async {
-                                      CommonService.closeKeyboard(context);
-                                      setState(() {
-                                        isloginClicked = true;
-                                        usernameError = (isuserNameValid(username.text)) ? null : "Enter User Name";
-                                        emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
-                                        passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
-                                      });
-
-                                      Map<String, dynamic> data = {"user_name": username.text, "email": email.text};
-                                      if (isEmailValid(email.text) && isPasswordValid(password.text) && isuserNameValid(username.text)) {
-                                        print("sign up");
-
-                                        User? result = await authService.signUpWithEmailAndPassword(email.text, password.text);
-
-                                        if (result != null) {
-                                          DatabaseMethods().addUserInfo(data);
-                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                                          prefs.setString("user_login_id", result.uid);
-
-                                          String? uid = result.uid;
-                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyCustomUI(uid)));
-                                        } else {
-                                          setState(() {
-                                            passwoedError = "Un error Try after sometime..";
-                                          });
-                                        }
-
-                                        print(" resulttt --- ${result == null}");
-                                        print(" resulttt --- ${result?.uid}");
-                                      }
+                                      if (enablesigninbutton) {}
+                                      signupCall();
                                     },
                                     child: const Padding(
                                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -332,5 +305,39 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         )
       ],
     );
+  }
+
+  Future<void> signupCall() async {
+    CommonService.closeKeyboard(context);
+    setState(() {
+      isloginClicked = true;
+      usernameError = (isuserNameValid(username.text)) ? null : "Enter User Name";
+      emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
+      passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
+    });
+
+    Map<String, dynamic> data = {"user_name": username.text, "email": email.text};
+    if (isEmailValid(email.text) && isPasswordValid(password.text) && isuserNameValid(username.text)) {
+      setState(() {
+        enablesigninbutton = false;
+      });
+      CommonService.snackbar(context, "Loading Please wait....");
+
+      User? result = await authService.signUpWithEmailAndPassword(email.text, password.text);
+
+      if (result != null) {
+        DatabaseMethods().addUserInfo(data);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("user_login_id", result.uid);
+        prefs.setString("user_email", email.text);
+        CommonService.hideSnackbar(context);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyCustomUI()));
+      } else {
+        setState(() {
+          enablesigninbutton = true;
+          passwoedError = "Un error Try after sometime..";
+        });
+      }
+    }
   }
 }

@@ -9,6 +9,34 @@ class CommonService {
       currentFocus.unfocus();
     }
   }
+
+  static void snackbar(context, String content, {bool showLoader = true}) {
+    final snackBar = SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(content),
+            if (showLoader)
+              const Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+          ],
+        ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  static void hideSnackbar(context) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  }
 }
 
 class MyBehavior extends ScrollBehavior {

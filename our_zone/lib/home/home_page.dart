@@ -1,11 +1,15 @@
 // IMAGE LINK : https://unsplash.com/photos/bOBM8CB4ZC4
 
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:our_zone/login_Register/login_register.dart';
+import 'package:our_zone/util/services/auth_services.dart';
+import 'package:our_zone/util/services/db_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyCustomUI extends StatefulWidget {
-  final String? uid;
-  const MyCustomUI(this.uid, {Key? key}) : super(key: key);
+  const MyCustomUI({Key? key}) : super(key: key);
 
   @override
   _MyCustomUIState createState() => _MyCustomUIState();
@@ -16,14 +20,16 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
   late Animation<double> _animation1;
   late Animation<double> _animation2;
   late Animation<double> _animation3;
+  String? email;
 
   bool _bool = true;
 
   @override
   void initState() {
+    getUserdetails();
     super.initState();
 
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 600));
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
 
     _animation1 = Tween<double>(begin: 0, end: 20).animate(CurvedAnimation(
       parent: _animationController,
@@ -55,6 +61,20 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> getUserdetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    email = await prefs.getString("user_email");
+    setState(() {});
+
+    print("emailllll ----- $email");
+    if (email != null) {
+      QuerySnapshot result = await DatabaseMethods().getUserInfo(email!);
+
+      print(result.docs.map((e) => e.data()).toList());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -79,20 +99,20 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
       ),
       body: Stack(
         children: [
-          // ALWAYS PLACE IT ON THE TOP OF EVERY WIDGET...
-          // backgroundImage(),
           Container(
             color: Colors.cyan.shade600,
+            child: Center(
+              child: Text(
+                "$email",
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
           ),
-
-          // EVERYTHING SHOULD BE HERE...
           SizedBox(
             height: _height,
             width: _width,
             child: null,
           ),
-
-          // ALWAYS PLACE IT ON THE BOTTOM OF EVERY WIDGET...
           customNavigationDrawer(),
         ],
       ),
@@ -136,6 +156,13 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
                       myTile(Icons.info_outline_rounded, 'About', () {}),
                       myTile(Icons.feedback_outlined, 'Feedback', () {}),
                       myTile(Icons.find_in_page_outlined, 'Privacy Policy', () {}),
+                      myTile(Icons.logout_outlined, 'Logout', () async {
+                        User? result = await AuthService().signOut();
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        prefs.remove("user_login_id");
+
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginRegister()));
+                      }),
                     ],
                   ),
                   const SizedBox(),

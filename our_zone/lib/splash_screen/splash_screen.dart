@@ -55,7 +55,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
 
     Timer(const Duration(seconds: 4), () {
       setState(() {
-        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : MyCustomUI(uid)));
+        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : const MyCustomUI()));
       });
     });
   }
