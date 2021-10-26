@@ -67,12 +67,11 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
     email = await prefs.getString("user_email");
     setState(() {});
 
-    print("emailllll ----- $email");
-    if (email != null) {
-      QuerySnapshot result = await DatabaseMethods().getUserInfo(email!);
+    // print("emailllll ----- $email");
+    // if (email != null) {
+    //   QuerySnapshot result = await DatabaseMethods().getUserInfo(email!);
 
-      print(result.docs.map((e) => e.data()).toList());
-    }
+    // }
   }
 
   @override

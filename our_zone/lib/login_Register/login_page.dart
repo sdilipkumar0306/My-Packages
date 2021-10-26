@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:our_zone/home/home_main.dart';
 import 'package:our_zone/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/util/services/auth_services.dart';
@@ -341,7 +342,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
         CommonService.hideSnackbar(context);
 
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyCustomUI()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMain()));
       } else {
         CommonService.hideSnackbar(context);
         setState(() {

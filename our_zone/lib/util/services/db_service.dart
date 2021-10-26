@@ -9,10 +9,10 @@ class DatabaseMethods {
     });
   }
 
-Future<QuerySnapshot<Object?>>  getUserInfo(String email) async {
-    return FirebaseFirestore.instance.collection("users").where("userEmail", isEqualTo: email).get().catchError((e) {
-      print(e.toString());
-    });
+  Future<QuerySnapshot<Object?>> getUserInfo(String uid) async {
+    Stream<QuerySnapshot<Map<String, dynamic>>> data = await FirebaseFirestore.instance.collection("users").where("user_uid", isEqualTo: uid).snapshots();
+
+    return data.elementAt(0);
   }
 
   searchByName(String searchField) {

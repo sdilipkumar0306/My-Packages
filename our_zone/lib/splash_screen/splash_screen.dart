@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:our_zone/home/home_main.dart';
 import 'package:our_zone/home/home_page.dart';
 import 'package:our_zone/login_Register/login_register.dart';
 import 'package:our_zone/util/constants.dart';
@@ -55,7 +56,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
 
     Timer(const Duration(seconds: 4), () {
       setState(() {
-        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : const MyCustomUI()));
+        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : const HomeMain()));
       });
     });
   }

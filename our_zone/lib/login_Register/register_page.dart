@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:our_zone/home/home_main.dart';
 import 'package:our_zone/home/home_page.dart';
 import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -315,8 +316,9 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
       emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
       passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
     });
+    String tempEmail = email.text;
+    String tempUserName = username.text;
 
-    Map<String, dynamic> data = {"user_name": username.text, "email": email.text};
     if (isEmailValid(email.text) && isPasswordValid(password.text) && isuserNameValid(username.text)) {
       setState(() {
         enablesigninbutton = false;
@@ -326,12 +328,16 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
       User? result = await authService.signUpWithEmailAndPassword(email.text, password.text);
 
       if (result != null) {
+
+    Map<String, dynamic> data = {"user_name": tempUserName, "email": tempEmail, "user_uid":result.uid};
+
+
         DatabaseMethods().addUserInfo(data);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("user_login_id", result.uid);
         prefs.setString("user_email", email.text);
         CommonService.hideSnackbar(context);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyCustomUI()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMain()));
       } else {
         setState(() {
           enablesigninbutton = true;
