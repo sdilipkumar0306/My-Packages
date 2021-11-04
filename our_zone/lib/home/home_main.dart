@@ -75,8 +75,9 @@ class _HomeMainState extends State<HomeMain> {
               SizedBox(
                 height: size.height,
                 child: ListView.builder(
+
                     shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 200),
+                    padding: const EdgeInsets.only(bottom: 200, top: 5),
                     scrollDirection: Axis.vertical,
                     itemCount: 20,
                     itemBuilder: (context, index) {
@@ -105,7 +106,10 @@ class _HomeMainState extends State<HomeMain> {
     required Function(String) response,
   }) {
     return Card(
+      elevation: 5,
+     
       child: ListTile(
+
         title: Text(title),
         subtitle: Text(lastText),
         minLeadingWidth: 50,

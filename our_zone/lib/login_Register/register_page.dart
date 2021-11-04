@@ -99,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                     scale: _transform.value,
                     child: Container(
                       width: size.width * .9,
-                      height: size.height * 0.65,
+                      height:(size.height < 600)?size.height :600,
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(15),
@@ -125,96 +125,98 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             ),
                             margin: const EdgeInsets.only(top: 50),
                             padding: const EdgeInsets.symmetric(vertical: 30),
-                            height: size.height * 0.6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                const SizedBox(height: 20),
-                                Text(
-                                  'Sign Up',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black.withOpacity(.7),
+                            // height: size.height * 0.6,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black.withOpacity(.7),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(),
-                                textFields(
-                                    icon: Icons.account_circle_outlined,
-                                    hintText: "User name...",
-                                    isPassword: false,
-                                    isEmail: false,
-                                    controller: username,
-                                    validator: usernameError,
-                                    onchange: () {
-                                      if (isloginClicked) {
-                                        setState(() {
-                                          usernameError = (isuserNameValid(username.text)) ? null : "Enter User Name";
-                                        });
-                                      }
-                                    }),
-                                textFields(
-                                    icon: Icons.email_outlined,
-                                    hintText: "Email..",
-                                    isPassword: false,
-                                    isEmail: true,
-                                    controller: email,
-                                    validator: emmailError,
-                                    onchange: () {
-                                      if (isloginClicked) {
-                                        setState(() {
-                                          emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
-                                        });
-                                      }
-                                    }),
-                                textFields(
-                                    icon: Icons.lock_outline,
-                                    hintText: "Password..",
-                                    isPassword: true,
-                                    isEmail: false,
-                                    controller: password,
-                                    validator: passwoedError,
-                                    onchange: () {
-                                      if (isloginClicked) {
-                                        setState(() {
-                                          passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
-                                        });
-                                      }
-                                    }),
-                                ElevatedButton(
-                                    onPressed: () async {
-                                      if (enablesigninbutton) {}
-                                      signupCall();
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                      child: Text("Sign Up", style: TextStyle(color: Colors.white)),
-                                    )),
-                                const SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      const Text("Alredy have an Account?"),
-                                      const SizedBox(),
-                                      TextButton(
-                                          style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                              splashFactory: NoSplash.splashFactory,
-                                              overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                                          onPressed: () {
-                                            widget.changePage();
-                                          },
-                                          child: const Text(
-                                            'Login',
-                                            style: TextStyle(color: Colors.blueAccent),
-                                          )),
-                                    ],
+                                  const SizedBox(),
+                                  textFields(
+                                      icon: Icons.account_circle_outlined,
+                                      hintText: "User name...",
+                                      isPassword: false,
+                                      isEmail: false,
+                                      controller: username,
+                                      validator: usernameError,
+                                      onchange: () {
+                                        if (isloginClicked) {
+                                          setState(() {
+                                            usernameError = (isuserNameValid(username.text)) ? null : "Enter User Name";
+                                          });
+                                        }
+                                      }),
+                                  textFields(
+                                      icon: Icons.email_outlined,
+                                      hintText: "Email..",
+                                      isPassword: false,
+                                      isEmail: true,
+                                      controller: email,
+                                      validator: emmailError,
+                                      onchange: () {
+                                        if (isloginClicked) {
+                                          setState(() {
+                                            emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
+                                          });
+                                        }
+                                      }),
+                                  textFields(
+                                      icon: Icons.lock_outline,
+                                      hintText: "Password..",
+                                      isPassword: true,
+                                      isEmail: false,
+                                      controller: password,
+                                      validator: passwoedError,
+                                      onchange: () {
+                                        if (isloginClicked) {
+                                          setState(() {
+                                            passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
+                                          });
+                                        }
+                                      }),
+                                  ElevatedButton(
+                                      onPressed: () async {
+                                        if (enablesigninbutton) {}
+                                        signupCall();
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                        child: Text("Sign Up", style: TextStyle(color: Colors.white)),
+                                      )),
+                                  const SizedBox(),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        const Text("Alredy have an Account?"),
+                                        const SizedBox(),
+                                        TextButton(
+                                            style: ButtonStyle(
+                                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                splashFactory: NoSplash.splashFactory,
+                                                overlayColor: MaterialStateProperty.all(Colors.transparent)),
+                                            onPressed: () {
+                                              widget.changePage();
+                                            },
+                                            child: const Text(
+                                              'Login',
+                                              style: TextStyle(color: Colors.blueAccent),
+                                            )),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(),
-                              ],
+                                  const SizedBox(),
+                                ],
+                              ),
                             ),
                           ),
                           Align(

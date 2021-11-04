@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:our_zone/util/common_service.dart';
 import 'package:our_zone/util/data_time_convertipon.dart';
 
+import 'user_chats.dart';
+
 class SearchUserUI extends StatefulWidget {
   const SearchUserUI({Key? key}) : super(key: key);
 
@@ -128,10 +130,15 @@ class _SearchUserUIState extends State<SearchUserUI> {
           child: const Center(child: Icon(Icons.person)),
         ),
         trailing: IconButton(
-          onPressed: () {},
+          onPressed: () {
+             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatMainUI()));
+          },
           icon: const Icon(Icons.message_rounded),
           splashRadius: 10,
         ),
+        onTap: (){
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatMainUI()));
+        },
       ),
     );
   }

@@ -74,32 +74,32 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     return Scaffold(
       body: ScrollConfiguration(
         behavior: MyBehavior(),
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height: size.height,
-            child: GestureDetector(
-              onTap: () {
-                CommonService.closeKeyboard(context);
-              },
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.blue.shade600,
-                      Colors.cyan,
-                    ],
-                  ),
+        child: SizedBox(
+          height: size.height,
+          child: GestureDetector(
+            onTap: () {
+              CommonService.closeKeyboard(context);
+            },
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade600,
+                    Colors.cyan,
+                  ],
                 ),
-                child: Opacity(
-                  opacity: _opacity.value,
-                  child: Transform.scale(
-                    scale: _transform.value,
+              ),
+              child: Opacity(
+                opacity: _opacity.value,
+                child: Transform.scale(
+                  scale: _transform.value,
+                  child: Center(
                     child: Container(
                       width: size.width * .9,
-                      height: size.height * 0.6,
+                      height: (size.height < 600)? size.height : 600,
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(15),
@@ -124,109 +124,113 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               ],
                             ),
                             margin: const EdgeInsets.only(top: 50),
-                            padding: const EdgeInsets.symmetric(vertical: 30),
-                            height: size.height * 0.6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                const SizedBox(height: 20),
-                                Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black.withOpacity(.7),
-                                  ),
-                                ),
-                                const SizedBox(),
-                                textFields(
-                                    icon: Icons.email_outlined,
-                                    hintText: "Email..",
-                                    isPassword: false,
-                                    isEmail: true,
-                                    controller: email,
-                                    validator: emmailError,
-                                    onchange: () {
-                                      if (isloginClicked) {
-                                        setState(() {
-                                          emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
-                                        });
-                                      }
-                                    }),
-                                const SizedBox(),
-                                textFields(
-                                    icon: Icons.lock_outline,
-                                    hintText: "Password..",
-                                    isPassword: true,
-                                    isEmail: false,
-                                    controller: password,
-                                    validator: passwoedError,
-                                    onchange: () {
-                                      if (isloginClicked) {
-                                        setState(() {
-                                          passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
-                                        });
-                                      }
-                                    }),
-                                Row(
+                            padding: const EdgeInsets.only(top: 70, bottom: 20),
+                           
+                            child: SingleChildScrollView(
+                              child: Center(
+                                child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        if (enableLoginButton) {
-                                          logincall();
-                                        }
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 20),
-                                        child: Text("Login", style: TextStyle(color: Colors.white)),
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black.withOpacity(.7),
                                       ),
                                     ),
-                                    SizedBox(width: size.width / 25),
-                                    Container(
-                                      width: size.width / 2.6,
-                                      alignment: Alignment.center,
-                                      child: TextButton(
-                                          style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                              splashFactory: NoSplash.splashFactory,
-                                              overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                                          onPressed: () {
+                                    const SizedBox(height: 20,),
+                                    textFields(
+                                        icon: Icons.email_outlined,
+                                        hintText: "Email..",
+                                        isPassword: false,
+                                        isEmail: true,
+                                        controller: email,
+                                        validator: emmailError,
+                                        onchange: () {
+                                          if (isloginClicked) {
                                             setState(() {
-                                              emmailError = null;
+                                              emmailError = (isEmailValid(email.text)) ? null : "Enter valid Email";
                                             });
-                                            if (isEmailValid(email.text)) {
-                                              authservice.resetPass(email.text);
-                                              CommonService.snackbar(context, "Email sent to registerd Email Id", showLoader: false);
-                                            } else {
-                                              setState(() {
-                                                emmailError = "Enter Email";
-                                              });
+                                          }
+                                        }),
+                                    const SizedBox(),
+                                    textFields(
+                                        icon: Icons.lock_outline,
+                                        hintText: "Password..",
+                                        isPassword: true,
+                                        isEmail: false,
+                                        controller: password,
+                                        validator: passwoedError,
+                                        onchange: () {
+                                          if (isloginClicked) {
+                                            setState(() {
+                                              passwoedError = (isPasswordValid(password.text)) ? null : "Enter valid Password";
+                                            });
+                                          }
+                                        }),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            if (enableLoginButton) {
+                                              logincall();
                                             }
                                           },
-                                          child: const Text(
-                                            'Forget password!',
-                                            style: TextStyle(color: Colors.blueAccent),
-                                          )),
-                                    )
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 20),
+                                            child: Text("Login", style: TextStyle(color: Colors.white)),
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width / 25),
+                                        Container(
+                                          width: size.width / 2.6,
+                                          alignment: Alignment.center,
+                                          child: TextButton(
+                                              style: ButtonStyle(
+                                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                  splashFactory: NoSplash.splashFactory,
+                                                  overlayColor: MaterialStateProperty.all(Colors.transparent)),
+                                              onPressed: () {
+                                                setState(() {
+                                                  emmailError = null;
+                                                });
+                                                if (isEmailValid(email.text)) {
+                                                  authservice.resetPass(email.text);
+                                                  CommonService.snackbar(context, "Email sent to registerd Email Id", showLoader: false);
+                                                } else {
+                                                  setState(() {
+                                                    emmailError = "Enter Email";
+                                                  });
+                                                }
+                                              },
+                                              child: const Text(
+                                                'Forget password!',
+                                                style: TextStyle(color: Colors.blueAccent),
+                                              )),
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(),
+                                    TextButton(
+                                      onPressed: () {
+                                        widget.changePage();
+                                      },
+                                      child: const Text(
+                                        'Create a new Account',
+                                        style: TextStyle(color: Colors.blueAccent),
+                                      ),
+                                      style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                          splashFactory: NoSplash.splashFactory,
+                                          overlayColor: MaterialStateProperty.all(Colors.transparent)),
+                                    ),
+                                    const SizedBox(),
                                   ],
                                 ),
-                                const SizedBox(),
-                                TextButton(
-                                  onPressed: () {
-                                    widget.changePage();
-                                  },
-                                  child: const Text(
-                                    'Create a new Account',
-                                    style: TextStyle(color: Colors.blueAccent),
-                                  ),
-                                  style: ButtonStyle(
-                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                      splashFactory: NoSplash.splashFactory,
-                                      overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                                ),
-                                const SizedBox(),
-                              ],
+                              ),
                             ),
                           ),
                           Align(

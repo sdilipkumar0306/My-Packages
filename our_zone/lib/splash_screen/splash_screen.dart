@@ -90,7 +90,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
         children: [
           Column(
             children: [
-              AnimatedContainer(duration: const Duration(milliseconds: 2000), curve: Curves.fastLinearToSlowEaseIn, height: _height / _fontSize),
+              AnimatedContainer(duration: const Duration(milliseconds: 2000), curve: Curves.fastLinearToSlowEaseIn, height:( _height / _fontSize -10)),
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 1000),
                 opacity: _textOpacity,
@@ -113,8 +113,8 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
               child: AnimatedContainer(
                   duration: const Duration(milliseconds: 2000),
                   curve: Curves.fastLinearToSlowEaseIn,
-                  height: (_width / _containerSize) - 3,
-                  width: (_width / _containerSize) - 3,
+                  height: 250,
+                  width: 250,
                   decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: AssetCircularImage(height: (_width / _containerSize) - 3, width: (_width / _containerSize) - 3, imagePath: UiConstants.logopath)),
             ),
