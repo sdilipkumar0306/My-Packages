@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:our_zone/util/modal_classes/user_static_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -59,9 +61,13 @@ class AuthService {
 
   Future signOut() async {
     try {
+      SharedPreferences data = await SharedPreferences.getInstance();
+      data.clear();
+      UserData.userdetails = null;
+      UserData.messagesList.clear();
+
       return await _auth.signOut();
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }

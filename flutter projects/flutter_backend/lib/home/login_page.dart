@@ -371,7 +371,7 @@ class _LoginPageUIState extends State<LoginPageUI> with InputValidationMixin {
                             type: BtnConstants.WITHOUT_ICON,
                             returnBack: (data) async {
                               if (data == BtnConstants.ON_TAP) {
-                                HTTPServiceModal response = await createUser();
+                                await createUser();
                               }
                             },
                           ),

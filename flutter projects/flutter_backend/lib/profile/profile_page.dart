@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +5,6 @@ import 'package:flutter_backend/home/login_page.dart';
 import 'package:flutter_backend/home/login_page_modal.dart';
 import 'package:flutter_backend/service/http_service_modal.dart';
 import 'package:flutter_backend/service/https_service.dart';
-import 'package:flutter_backend/util/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sdk0306/sdk0306.dart';
 

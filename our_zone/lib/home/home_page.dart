@@ -1,11 +1,9 @@
 // IMAGE LINK : https://unsplash.com/photos/bOBM8CB4ZC4
 
 import 'dart:ui';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:our_zone/login_Register/login_register.dart';
+import 'package:our_zone/login_register_page/login_register_ui.dart';
 import 'package:our_zone/util/services/auth_services.dart';
-import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyCustomUI extends StatefulWidget {
@@ -26,7 +24,7 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    getUserdetails();
+    // getUserdetails();
     super.initState();
 
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
@@ -59,19 +57,6 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  Future<void> getUserdetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    email = await prefs.getString("user_email");
-    setState(() {});
-
-    // print("emailllll ----- $email");
-    // if (email != null) {
-    //   QuerySnapshot result = await DatabaseMethods().getUserInfo(email!);
-
-    // }
   }
 
   @override
@@ -156,11 +141,11 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
                       myTile(Icons.feedback_outlined, 'Feedback', () {}),
                       myTile(Icons.find_in_page_outlined, 'Privacy Policy', () {}),
                       myTile(Icons.logout_outlined, 'Logout', () async {
-                        User? result = await AuthService().signOut();
+                        await AuthService().signOut();
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.remove("user_login_id");
 
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginRegister()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LogInRegisterUI()));
                       }),
                     ],
                   ),
@@ -216,7 +201,7 @@ class _MyCustomUIState extends State<MyCustomUI> with TickerProviderStateMixin {
   }
 
   Widget divider() {
-    return Container(
+    return SizedBox(
       height: 5,
       width: MediaQuery.of(context).size.width,
     );

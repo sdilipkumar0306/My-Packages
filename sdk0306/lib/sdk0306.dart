@@ -3,7 +3,6 @@ library sdk0306;
 import 'package:flutter/material.dart';
 
 import 'package:flutter/foundation.dart';
-import 'package:sdk0306/sdk0306.dart';
 import "package:universal_html/html.dart" as html;
 
 

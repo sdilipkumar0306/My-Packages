@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:our_zone/util/constants.dart';
+import 'package:our_zone/util/contstants/constants.dart';
 import 'package:our_zone/util/data_time_convertipon.dart';
 import 'package:our_zone/util/images_display.dart';
+import 'package:our_zone/util/modal_classes/common_modails.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final AllUsersData opponentData;
+  const ChatScreen({required this.opponentData,Key? key}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -130,9 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
               Container(
                 width: MediaQuery.of(context).size.width * 0.6,
                 padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.white),
+                decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.white),
                 child: Column(
                   children: [
                     Text(
@@ -143,8 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         alignment: Alignment.bottomRight,
                         child: Padding(
                           padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(DateTimeConversion()
-                              .timeConversion(TimeOfDay.now())),
+                          child: Text(DateTimeConversion().timeConversion(TimeOfDay.now())),
                         ))
                   ],
                 ),
@@ -152,12 +151,16 @@ class _ChatScreenState extends State<ChatScreen> {
               const SizedBox(width: 5),
               Container(
                 decoration: const BoxDecoration(
-                    shape: BoxShape.circle, 
-                    // color: Colors.white
-                    ),
+                  shape: BoxShape.circle,
+                  // color: Colors.white
+                ),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.done_all_rounded, size: 16,color: Colors.white,),
+                  child: Icon(
+                    Icons.done_all_rounded,
+                    size: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -175,16 +178,13 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: AssetCircularImage(
-                height: 40, width: 40, imagePath: UiConstants.logopath),
+            child: AssetCircularImage(height: 40, width: 40, imagePath: UiConstants.logopath),
           ),
           const SizedBox(width: 5),
           Container(
             width: MediaQuery.of(context).size.width * 0.6,
             padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white),
+            decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.white),
             child: Column(
               children: [
                 Text(
@@ -195,8 +195,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     alignment: Alignment.bottomRight,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          DateTimeConversion().timeConversion(TimeOfDay.now())),
+                      child: Text(DateTimeConversion().timeConversion(TimeOfDay.now())),
                     ))
               ],
             ),
@@ -205,24 +204,22 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
   Widget msgBox(String type) {
     return Container(
-      margin:  (type == "SEND") ?  const EdgeInsets.only(left: 60, top: 5, bottom: 5) : const EdgeInsets.only(right: 60, top: 5, bottom: 5),
+      margin: (type == "SEND") ? const EdgeInsets.only(left: 60, top: 5, bottom: 5) : const EdgeInsets.only(right: 60, top: 5, bottom: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: AssetCircularImage(
-                height: 40, width: 40, imagePath: UiConstants.logopath),
+            child: AssetCircularImage(height: 40, width: 40, imagePath: UiConstants.logopath),
           ),
           const SizedBox(width: 5),
           Container(
             width: MediaQuery.of(context).size.width * 0.6,
             padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white),
+            decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.white),
             child: Column(
               children: [
                 Text(
@@ -233,8 +230,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     alignment: Alignment.bottomRight,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          DateTimeConversion().timeConversion(TimeOfDay.now())),
+                      child: Text(DateTimeConversion().timeConversion(TimeOfDay.now())),
                     ))
               ],
             ),

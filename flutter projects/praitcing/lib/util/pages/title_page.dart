@@ -4,7 +4,7 @@ class TitlePageUI extends StatefulWidget {
   final String title;
 
   final Color textColor;
-  const TitlePageUI(this.title, {this.textColor: Colors.white, Key? key}) : super(key: key);
+  const TitlePageUI(this.title, {this.textColor= Colors.white, Key? key}) : super(key: key);
 
   @override
   _TitlePageUIState createState() => _TitlePageUIState();

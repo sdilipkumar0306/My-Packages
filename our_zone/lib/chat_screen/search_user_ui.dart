@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:our_zone/util/common_service.dart';
-import 'package:our_zone/util/data_time_convertipon.dart';
+import 'package:our_zone/util/modal_classes/common_modails.dart';
+import 'package:our_zone/util/modal_classes/user_static_data.dart';
+import 'package:our_zone/util/services/db_service.dart';
 
 import 'user_chats.dart';
 
@@ -13,7 +16,27 @@ class SearchUserUI extends StatefulWidget {
 
 class _SearchUserUIState extends State<SearchUserUI> {
   Size size = const Size(0, 0);
-  TextEditingController message = TextEditingController();
+  TextEditingController searchController = TextEditingController();
+
+  List<AllUsersData> allusersdata = List<AllUsersData>.empty(growable: true);
+  List<AllUsersData> filteruserData = List<AllUsersData>.empty(growable: true);
+
+  @override
+  void initState() {
+    getAllUserDetails();
+    super.initState();
+  }
+
+  Future<void> getAllUserDetails() async {
+    // QuerySnapshot data = await DatabaseMethods().getallusers();
+
+    // GetAllUsersResponseData details = GetAllUsersResponseData.parseAllUsersDataResponse(data.docs.map((e) => e.data()).toList());
+    // allusersdata = details.allusersdata;
+    // allusersdata.removeWhere((e) => e.id == UserData.userdetails?.userID);
+    // filteruserData = details.allusersdata;
+    if (!mounted) return;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +46,6 @@ class _SearchUserUIState extends State<SearchUserUI> {
       appBar: AppBar(
         title: const Text("Find Friends"),
         centerTitle: true,
-        // actions: [
-        //   IconButton(
-        //     onPressed: () async {},
-        //     icon: const Icon(Icons.more_vert_rounded),
-        //     splashRadius: 10,
-        //   ),
-        // ],
         leadingWidth: 30,
         leading: IconButton(
           onPressed: () {
@@ -44,7 +60,6 @@ class _SearchUserUIState extends State<SearchUserUI> {
         height: size.height - 50,
         child: GestureDetector(
           onTap: () {
-            print("tapppp");
             CommonService.closeKeyboard(context);
           },
           child: SizedBox(
@@ -60,25 +75,28 @@ class _SearchUserUIState extends State<SearchUserUI> {
                         width: size.width - 50,
                         height: 50,
                         child: TextFormField(
-                          controller: message,
+                          controller: searchController,
                           style: const TextStyle(color: Colors.black, fontSize: 20),
                           decoration: const InputDecoration(
                               hintText: "Search...",
                               hintStyle: TextStyle(color: Colors.black),
-                              // prefixIcon: IconButton(
-                              //     onPressed: () {},
-                              //     icon: const Icon(
-                              //       Icons.emoji_emotions_outlined,
-                              //       size: 30,
-                              //       color: Colors.white,
-                              //     )),
-
                               filled: true,
                               fillColor: Colors.grey,
                               border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10.0)), borderSide: BorderSide(color: Colors.white)),
                               focusColor: Colors.white,
                               focusedBorder:
                                   OutlineInputBorder(borderSide: BorderSide(color: Colors.white), borderRadius: BorderRadius.all(Radius.circular(10.0)))),
+                          onChanged: (data) {
+                            if (searchController.text.length > 1) {
+                              filteruserData =
+                                  allusersdata.where((e) => e.userName.contains(searchController.text) || e.email.contains(searchController.text)).toList();
+                            } else {
+                              filteruserData = allusersdata;
+                            }
+
+                            if (!mounted) return;
+                            setState(() {});
+                          },
                         ),
                       ),
                       Container(
@@ -88,7 +106,7 @@ class _SearchUserUIState extends State<SearchUserUI> {
                         decoration: BoxDecoration(color: Colors.cyan.shade700, shape: BoxShape.circle),
                         child: Center(
                             child: IconButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   CommonService.closeKeyboard(context);
                                 },
                                 icon: const Icon(
@@ -102,7 +120,7 @@ class _SearchUserUIState extends State<SearchUserUI> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
-                      children: List.generate(10, (index) => chatListtile(title: "title - $index", lastText: "lastText - $index")),
+                      children: List.generate(filteruserData.length, (index) => chatListtile(index: index)),
                     ),
                   ),
                 )
@@ -114,14 +132,11 @@ class _SearchUserUIState extends State<SearchUserUI> {
     );
   }
 
-  Widget chatListtile({
-    required String title,
-    required String lastText,
-  }) {
+  Widget chatListtile({required int index}) {
     return Card(
       child: ListTile(
-        title: Text(title),
-        subtitle: Text(lastText),
+        title: Text(filteruserData.elementAt(index).userName),
+        subtitle: Text(filteruserData.elementAt(index).email),
         minLeadingWidth: 50,
         leading: Container(
           width: 50,
@@ -131,13 +146,13 @@ class _SearchUserUIState extends State<SearchUserUI> {
         ),
         trailing: IconButton(
           onPressed: () {
-             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatMainUI()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatMainUI(opponentData: filteruserData.elementAt(index))));
           },
           icon: const Icon(Icons.message_rounded),
           splashRadius: 10,
         ),
-        onTap: (){
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatMainUI()));
+        onTap: () {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatMainUI(opponentData: filteruserData.elementAt(index))));
         },
       ),
     );

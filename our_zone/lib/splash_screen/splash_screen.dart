@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:our_zone/home/home_main.dart';
-import 'package:our_zone/home/home_page.dart';
-import 'package:our_zone/login_Register/login_register.dart';
-import 'package:our_zone/util/constants.dart';
+import 'package:our_zone/util/contstants/constants.dart';
 import 'package:our_zone/util/images_display.dart';
+import 'package:our_zone/login_register_page/login_register_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyCustomSplashScreen extends StatefulWidget {
@@ -56,7 +55,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
 
     Timer(const Duration(seconds: 4), () {
       setState(() {
-        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LoginRegister() : const HomeMain()));
+        Navigator.pushReplacement(context, PageTransition((gotologinRegister) ? const LogInRegisterUI() : const HomeMain()));
       });
     });
   }
@@ -90,7 +89,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
         children: [
           Column(
             children: [
-              AnimatedContainer(duration: const Duration(milliseconds: 2000), curve: Curves.fastLinearToSlowEaseIn, height:( _height / _fontSize -10)),
+              AnimatedContainer(duration: const Duration(milliseconds: 2000), curve: Curves.fastLinearToSlowEaseIn, height: (_height / _fontSize - 10)),
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 1000),
                 opacity: _textOpacity,
