@@ -1,9 +1,9 @@
 class UserDetailsmodal {
-  final String userID;
-  final String name;
-  final String email;
-  final String profileImage;
-  final String aboutUser;
+  String userID;
+  String name;
+  String email;
+  String profileImage;
+  String aboutUser;
 
   UserDetailsmodal({
     required this.userID,

@@ -1,8 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:our_zone/home/home_main.dart';
+import 'package:our_zone/util/contstants/firebase_constants.dart';
+import 'package:our_zone/util/modal_classes/firebase_modal.dart';
+import 'package:our_zone/util/modal_classes/user_static_data.dart';
+import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../util/common_service.dart';
@@ -493,24 +498,27 @@ class _LogInRegisterUIState extends State<LogInRegisterUI> with InputValidationM
       lg.emmailError = (isEmailValid(lg.emailController.text)) ? null : "Enter valid Email";
       lg.passwoedError = (isPasswordValid(lg.passwordController.text)) ? null : "Enter valid Password";
     });
-    String tempEmail = lg.emailController.text;
-    String tempUserName = lg.nameController.text;
 
     if (isEmailValid(lg.emailController.text) && isPasswordValid(lg.passwordController.text) && isuserNameValid(lg.nameController.text)) {
       setState(() {
         lg.enableButton = false;
       });
+      CreateUser newUser = CreateUser(userID: "NA", name: lg.nameController.text, email: lg.emailController.text);
       CommonService.snackbar(context, "Loading Please wait....");
 
-      User? result = await authService.signUpWithEmailAndPassword(lg.emailController.text, lg.passwordController.text);
-
+      User? result = await authService.signUpWithEmailAndPassword(newUser.email, lg.passwordController.text);
       if (result != null) {
-        Map<String, dynamic> data = {"user_name": tempUserName, "email": tempEmail, "user_uid": result.uid};
-
-        // DatabaseMethods().addUserInfo(result.uid, data);
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // prefs.setString("user_login_id", result.uid);
-        // prefs.setString("user_email", email.text);
+        newUser.userID = result.uid;
+        String? returResponse = DatabaseMethods().createUserInFirebase(newUser);
+        print(returResponse);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("user_login_id", result.uid);
+        prefs.setString("user_email", newUser.email);
+        UserData.userdetails?.userID = result.uid;
+        UserData.userdetails?.email = newUser.email;
+        UserData.userdetails?.name = newUser.name;
+        UserData.userdetails?.profileImage = newUser.profileImage ?? "NA";
+        UserData.userdetails?.aboutUser = newUser.aboutUser ?? "NA";
         CommonService.hideSnackbar(context);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMain()));
       } else {
@@ -541,8 +549,10 @@ class _LogInRegisterUIState extends State<LogInRegisterUI> with InputValidationM
 
       if (result != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("user_login_id", result.uid);
-        prefs.setString("user_email", lg.emailController.text);
+        prefs.setString(UserConstants.userID, result.uid);
+        prefs.setString(UserConstants.userEmail, lg.emailController.text);
+
+   
 
         CommonService.hideSnackbar(context);
 

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:our_zone/util/common_service.dart';
-import 'package:our_zone/util/contstants/message_constants.dart';
+import 'package:our_zone/util/contstants/firebase_constants.dart';
 import 'package:our_zone/util/data_time_convertipon.dart';
 import 'package:our_zone/util/modal_classes/common_modails.dart';
 import 'package:our_zone/util/modal_classes/create_message_modal.dart';
@@ -19,7 +19,7 @@ class ChatMainUI extends StatefulWidget {
 class _ChatMainUIState extends State<ChatMainUI> {
   Size size = const Size(0, 0);
   TextEditingController message = TextEditingController();
-  final db = FirebaseFirestore.instance;
+  int msgLength = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class _ChatMainUIState extends State<ChatMainUI> {
                           message.clear();
                           if (!mounted) return;
                           setState(() {});
-                          // DatabaseMethods().insertnewmessage(UserData.userdetails?.userID ?? "", widget.opponentData.id, newMsg.createMessageMap());
+                          DatabaseMethods().createMessage(newMsg, msgLength > 0);
                         }
                       },
                       icon: const Icon(
@@ -138,24 +138,27 @@ class _ChatMainUIState extends State<ChatMainUI> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 65),
             child: StreamBuilder<QuerySnapshot>(
-                stream: db
-                    .collection("messages")
+                stream: FirebaseFirestore.instance
+                    .collection(FbC.user)
                     .doc(UserData.userdetails?.userID)
-                    .collection(widget.opponentData.id)
-                    .orderBy(MsgConst.messageSentTime,descending: true)
+                    .collection(FbC.chats)
+                    .doc(widget.opponentData.id)
+                    .collection(FbC.messages)
+                    .orderBy(MsgConst.messageSentTime, descending: true)
                     .snapshots(),
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
                     return ListView.builder(
-                      reverse: true,
+                        reverse: true,
                         itemCount: snapShot.data?.docs.length,
                         itemBuilder: (context, index) {
+                          msgLength = snapShot.data?.docs.length ?? 0;
                           dynamic mydata = snapShot.data?.docs[index].data();
                           TimeOfDay time = (TimeOfDay(
                               hour: DateTime.parse(mydata[MsgConst.messageSentTime]).hour, minute: DateTime.parse(mydata[MsgConst.messageSentTime]).minute));
                           return MessageTile(
                             message: (mydata != null) ? mydata[MsgConst.messageContent] : "",
-                            sendByMe: ((mydata != null) ? mydata[MsgConst.messageFrom] : "") == UserData.userdetails?.userID ? true : false,
+                            sendByMe: (mydata[MsgConst.messageFrom]) == UserData.userdetails?.userID ? true : false,
                             time: time,
                           );
                         });

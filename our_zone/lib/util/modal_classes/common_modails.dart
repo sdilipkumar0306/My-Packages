@@ -1,3 +1,5 @@
+import 'package:our_zone/util/contstants/firebase_constants.dart';
+
 class GetAllUsersResponseData {
   List<AllUsersData> allusersdata;
 
@@ -12,18 +14,21 @@ class AllUsersData {
   String userName;
   String email;
   String id;
+  String profileImage;
 
   AllUsersData({
     required this.userName,
     required this.email,
     required this.id,
+    required this.profileImage,
   });
 
   factory AllUsersData.response(dynamic data) {
     return AllUsersData(
-      userName: data["user_name"],
-      email: data["email"],
-      id: data["user_uid"],
+      userName: data[UserConstants.userName],
+      email: data[UserConstants.userEmail],
+      id: data[UserConstants.userID],
+      profileImage: data[UserConstants.userProfileImage],
     );
   }
 }

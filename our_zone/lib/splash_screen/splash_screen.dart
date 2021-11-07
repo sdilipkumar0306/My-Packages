@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:our_zone/home/home_main.dart';
 import 'package:our_zone/util/contstants/constants.dart';
+import 'package:our_zone/util/contstants/firebase_constants.dart';
 import 'package:our_zone/util/images_display.dart';
 import 'package:our_zone/login_register_page/login_register_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,8 +70,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen> with Ticker
   Future<void> nextPage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    uid = prefs.getString("user_login_id");
-
+    uid = prefs.getString(UserConstants.userID);
     if (uid != null) {
       gotologinRegister = false;
     } else {

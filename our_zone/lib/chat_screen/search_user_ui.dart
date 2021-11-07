@@ -28,12 +28,10 @@ class _SearchUserUIState extends State<SearchUserUI> {
   }
 
   Future<void> getAllUserDetails() async {
-    // QuerySnapshot data = await DatabaseMethods().getallusers();
-
-    // GetAllUsersResponseData details = GetAllUsersResponseData.parseAllUsersDataResponse(data.docs.map((e) => e.data()).toList());
-    // allusersdata = details.allusersdata;
-    // allusersdata.removeWhere((e) => e.id == UserData.userdetails?.userID);
-    // filteruserData = details.allusersdata;
+    List<AllUsersData> response = await DatabaseMethods().getAllUserDetails();
+    allusersdata = response;
+    allusersdata.removeWhere((e) => e.id == UserData.userdetails?.userID);
+    filteruserData = allusersdata;
     if (!mounted) return;
     setState(() {});
   }

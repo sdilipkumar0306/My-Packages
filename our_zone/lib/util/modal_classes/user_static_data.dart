@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:our_zone/util/modal_classes/chat_list_modal.dart.dart';
-import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'user_modal.dart';

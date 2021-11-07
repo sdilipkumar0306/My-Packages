@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:our_zone/chat_screen/search_user_ui.dart';
 import 'package:our_zone/chat_screen/user_chats.dart';
 import 'package:our_zone/util/contstants/constants.dart';
-import 'package:our_zone/util/contstants/message_constants.dart';
+import 'package:our_zone/util/contstants/firebase_constants.dart';
 import 'package:our_zone/login_register_page/login_register_ui.dart';
 import 'package:our_zone/util/modal_classes/chat_list_modal.dart.dart';
 import 'package:our_zone/util/modal_classes/common_modails.dart';
 import 'package:our_zone/util/modal_classes/user_static_data.dart';
 import 'package:our_zone/util/services/auth_services.dart';
+import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeMain extends StatefulWidget {
@@ -29,12 +30,21 @@ class _HomeMainState extends State<HomeMain> {
 
   @override
   void initState() {
-    if (UserData.messagesList.isEmpty) {
-      getchattedmessages();
-    } else {
-      allusersdata = UserData.messagesList;
-    }
+    setStaticdata();
+
     super.initState();
+  }
+
+  Future<void> setStaticdata() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? uid = prefs.getString(UserConstants.userID);
+    print(uid);
+    UserData.userdetails = await DatabaseMethods().getUserDetails(uid ?? "");
+    print(UserData.userdetails?.name);
+    print(UserData.userdetails?.email);
+    print(UserData.userdetails?.userID);
+    print(UserData.userdetails?.profileImage);
+    setState(() {});
   }
 
   @override
@@ -138,7 +148,10 @@ class _HomeMainState extends State<HomeMain> {
               MaterialPageRoute(
                   builder: (context) => ChatMainUI(
                         opponentData: AllUsersData(
-                            userName: allusersdata.elementAt(index).name, email: allusersdata.elementAt(index).email, id: allusersdata.elementAt(index).userID),
+                            userName: allusersdata.elementAt(index).name,
+                            email: allusersdata.elementAt(index).email,
+                            id: allusersdata.elementAt(index).userID,
+                            profileImage: 'NA'),
                       )));
           getchattedmessages();
         },
