@@ -7,6 +7,7 @@ import 'package:our_zone/util/modal_classes/common_modails.dart';
 import 'package:our_zone/util/modal_classes/create_message_modal.dart';
 import 'package:our_zone/util/modal_classes/user_static_data.dart';
 import 'package:our_zone/util/services/db_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatMainUI extends StatefulWidget {
   final AllUsersData opponentData;
@@ -113,11 +114,16 @@ class _ChatMainUIState extends State<ChatMainUI> {
                               messageSentTime: DateTime.now().toString(),
                               messageID: "NA",
                               messageReplayID: "NA",
-                              chatType: "INDIVIDUAL");
+                              chatType: "INDIVIDUAL",
+                              messageStatus: "SENT");
                           message.clear();
                           if (!mounted) return;
                           setState(() {});
-                          DatabaseMethods().createMessage(newMsg, msgLength > 0);
+                          DatabaseMethods().createMessage(newMsg, (msgLength + 1), widget.opponentData.userName);
+                          setMessagesCount(widget.opponentData.id, msgLength + 1);
+                          if (UserData.usersChatCount.isNotEmpty) {
+                            UserData.usersChatCount.firstWhere((e) => e.userUID == widget.opponentData.id).messageCount = msgLength + 1;
+                          }
                         }
                       },
                       icon: const Icon(
@@ -148,6 +154,15 @@ class _ChatMainUIState extends State<ChatMainUI> {
                     .snapshots(),
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
+                    if (snapShot.data?.docs != null && (snapShot.data?.docs.isNotEmpty ?? false)) {
+                      dynamic tempData = snapShot.data?.docs.first.data();
+                      CreateMessageModal lastMsg = CreateMessageModal.response(tempData);
+                      if (lastMsg.messageFrom != UserData.userdetails?.userID) {
+                        lastMsg.messageStatus = "SEEN";
+                        DatabaseMethods().setMsgSeen(widget.opponentData.id, lastMsg);
+                      }
+                    }
+
                     return ListView.builder(
                         reverse: true,
                         itemCount: snapShot.data?.docs.length,
@@ -156,10 +171,14 @@ class _ChatMainUIState extends State<ChatMainUI> {
                           dynamic mydata = snapShot.data?.docs[index].data();
                           TimeOfDay time = (TimeOfDay(
                               hour: DateTime.parse(mydata[MsgConst.messageSentTime]).hour, minute: DateTime.parse(mydata[MsgConst.messageSentTime]).minute));
+                          setMessagesCount(widget.opponentData.id, msgLength);
+                          UserData.usersChatCount.firstWhere((e) => e.userUID == widget.opponentData.id).messageCount = msgLength;
+
                           return MessageTile(
                             message: (mydata != null) ? mydata[MsgConst.messageContent] : "",
                             sendByMe: (mydata[MsgConst.messageFrom]) == UserData.userdetails?.userID ? true : false,
                             time: time,
+                            status: (index == 0) ? mydata[MsgConst.messageStatus] : null,
                           );
                         });
                   } else if (snapShot.hasError) {
@@ -170,7 +189,12 @@ class _ChatMainUIState extends State<ChatMainUI> {
                       child: CircularProgressIndicator(),
                     ));
                   } else {
-                    return const Center(child: Text("No data Found"));
+                    return const Center(
+                        child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(),
+                    ));
                   }
                 }),
           ),
@@ -216,38 +240,21 @@ class _ChatMainUIState extends State<ChatMainUI> {
       ),
     );
   }
-}
 
-// class MessageTile extends StatelessWidget {
-//   final String message;
-//   final bool sendByMe;
-//   const MessageTile({required this.message, required this.sendByMe, Key? key}) : super(key: key);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: EdgeInsets.only(top: 8, bottom: 8, left: sendByMe ? 0 : 24, right: sendByMe ? 24 : 0),
-//       alignment: sendByMe ? Alignment.centerRight : Alignment.centerLeft,
-//       child: Container(
-//         margin: sendByMe ? const EdgeInsets.only(left: 30) : const EdgeInsets.only(right: 30),
-//         padding: const EdgeInsets.only(top: 17, bottom: 17, left: 20, right: 20),
-//         decoration: BoxDecoration(
-//             borderRadius: sendByMe
-//                 ? const BorderRadius.only(topLeft: Radius.circular(23), topRight: Radius.circular(23), bottomLeft: Radius.circular(23))
-//                 : const BorderRadius.only(topLeft: Radius.circular(23), topRight: Radius.circular(23), bottomRight: Radius.circular(23)),
-//             color: sendByMe ? Colors.blue : Colors.purple.shade900),
-//         child: Text(message,
-//             textAlign: TextAlign.start, style: const TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'OverpassRegular', fontWeight: FontWeight.w300)),
-//       ),
-//     );
-//   }
-// }
+  Future<void> setMessagesCount(String id, int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setInt(id, value);
+  }
+}
 
 class MessageTile extends StatelessWidget {
   final String message;
   final bool sendByMe;
   final TimeOfDay time;
+  final String? status;
 
-  const MessageTile({required this.message, required this.sendByMe, required this.time, Key? key}) : super(key: key);
+  const MessageTile({required this.message, required this.sendByMe, required this.time, this.status, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +263,7 @@ class MessageTile extends StatelessWidget {
       alignment: sendByMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: sendByMe ? const EdgeInsets.only(left: 30) : const EdgeInsets.only(right: 30),
-        padding: const EdgeInsets.only(top: 17, bottom: 0, left: 20, right: 20),
+        padding: const EdgeInsets.only(top: 17, bottom: 0, left: 20, right: 15),
         decoration: BoxDecoration(
             borderRadius: sendByMe
                 ? const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomLeft: Radius.circular(15))
@@ -271,9 +278,21 @@ class MessageTile extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'OverpassRegular', fontWeight: FontWeight.w300)),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                timeConversion(time),
-                style: TextStyle(fontSize: 10, color: sendByMe ? Colors.black : Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeConversion(time),
+                    style: TextStyle(fontSize: 10, color: sendByMe ? Colors.black : Colors.white),
+                  ),
+                  const SizedBox(width: 3),
+                  if (status != null && sendByMe)
+                    Icon(
+                      status == "SENT" ? Icons.done_rounded : Icons.done_all_rounded,
+                      size: 16,
+                    )
+                ],
               ),
             ),
           ],

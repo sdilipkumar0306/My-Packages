@@ -7,6 +7,7 @@ class MainpageChatModal {
   String profileImage;
   String lastMessage;
   String lastMessageTime;
+  int msgCount;
 
   MainpageChatModal({
     required this.userID,
@@ -15,6 +16,7 @@ class MainpageChatModal {
     required this.profileImage,
     required this.lastMessage,
     required this.lastMessageTime,
+    required this.msgCount,
   });
 
   // factory MainpageChatModal.response(dynamic data) {

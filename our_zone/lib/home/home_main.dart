@@ -38,12 +38,7 @@ class _HomeMainState extends State<HomeMain> {
   Future<void> setStaticdata() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString(UserConstants.userID);
-    print(uid);
     UserData.userdetails = await DatabaseMethods().getUserDetails(uid ?? "");
-    print(UserData.userdetails?.name);
-    print(UserData.userdetails?.email);
-    print(UserData.userdetails?.userID);
-    print(UserData.userdetails?.profileImage);
     setState(() {});
   }
 
@@ -53,7 +48,7 @@ class _HomeMainState extends State<HomeMain> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(UiConstants.appName),
+        title: Text(UserData.userdetails?.name ?? UiConstants.appName),
         centerTitle: true,
         actions: [
           IconButton(
@@ -87,22 +82,72 @@ class _HomeMainState extends State<HomeMain> {
       body: SizedBox(
         width: size.width,
         height: size.height - 50,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: size.height,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 200, top: 5),
-                    scrollDirection: Axis.vertical,
-                    itemCount: allusersdata.length,
-                    itemBuilder: (context, index) {
-                      return chatListtile(index);
-                    }),
-              ),
-            ],
-          ),
+        child: SizedBox(
+          height: size.height,
+          child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection(FbC.user)
+                  .doc(UserData.userdetails?.userID)
+                  .collection(FbC.chats)
+                  .orderBy("last_msg_time", descending: true)
+                  .snapshots(),
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  return ListView.builder(
+                      itemCount: snapShot.data?.docs.length,
+                      itemBuilder: (context, index) {
+                        String oppUid = snapShot.data?.docs[index].id ?? "";
+                        dynamic oppName = snapShot.data?.docs[index].data();
+                        TimeOfDay time =
+                            (TimeOfDay(hour: DateTime.parse(oppName["last_msg_time"]).hour, minute: DateTime.parse(oppName["last_msg_time"]).minute));
+
+                        MainpageChatModal msgdata = MainpageChatModal(
+                            userID: oppUid,
+                            name: oppName[UserConstants.userName],
+                            email: "NA",
+                            profileImage: "NA",
+                            lastMessage: oppName["last_message"],
+                            lastMessageTime: timeConversion(time),
+                            msgCount: int.parse(oppName["message_count"].toString()));
+
+                        setMessagesCount(msgdata.userID, msgdata.msgCount);
+
+                        if (UserData.usersChatCount.isEmpty) {
+                          UserData.usersChatCount.add(UserChatCount(msgdata.userID, msgdata.msgCount));
+                        } else if (!UserData.usersChatCount.map((e) => e.userUID).toList().contains(msgdata.userID)) {
+                          UserData.usersChatCount.add(UserChatCount(msgdata.userID, msgdata.msgCount));
+                        }
+
+                        // getMessagesCount(snapShot.data?.docs.map((e) => e.id).toList() ?? []);
+
+                        return chatListtile(msgdata);
+                      });
+                } else if (snapShot.hasError) {
+                  return const Center(
+                      child: SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: CircularProgressIndicator(),
+                  ));
+                } else {
+                  return const Center(
+                      child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(),
+                  ));
+                  ;
+                }
+              }),
+
+          // ListView.builder(
+          //     shrinkWrap: true,
+          //     padding: const EdgeInsets.only(bottom: 200, top: 5),
+          //     scrollDirection: Axis.vertical,
+          //     itemCount: allusersdata.length,
+          //     itemBuilder: (context, index) {
+          //       return chatListtile(index);
+          //     }),
         ),
       ),
     );
@@ -111,12 +156,19 @@ class _HomeMainState extends State<HomeMain> {
   Widget chatListtile(
       // {required String title, required String lastText, required int count, required Function(String) response}
 
-      int index) {
+      MainpageChatModal data) {
+    int count = data.msgCount - UserData.usersChatCount.firstWhere((e) => e.userUID == data.userID).messageCount;
+
     return Card(
       elevation: 5,
       child: ListTile(
-        title: Text(allusersdata.elementAt(index).name),
-        subtitle: Text(allusersdata.elementAt(index).lastMessage),
+        title: Text(data.name),
+        subtitle: Text(
+          data.lastMessage,
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
         minLeadingWidth: 50,
         leading: Container(
           width: 50,
@@ -127,18 +179,19 @@ class _HomeMainState extends State<HomeMain> {
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(allusersdata.elementAt(index).lastMessageTime),
-            Container(
-              width: 25,
-              height: 25,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.cyan),
-              // child: Center(
-              //   child: Text(
-              //     "$count",
-              //     style: const TextStyle(fontSize: 14),
-              //   ),
-              // ),
-            ),
+            Text(data.lastMessageTime),
+            if (count > 0)
+              Container(
+                width: 25,
+                height: 25,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.cyan),
+                child: Center(
+                  child: Text(
+                    "$count",
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ),
             const SizedBox()
           ],
         ),
@@ -148,61 +201,44 @@ class _HomeMainState extends State<HomeMain> {
               MaterialPageRoute(
                   builder: (context) => ChatMainUI(
                         opponentData: AllUsersData(
-                            userName: allusersdata.elementAt(index).name,
-                            email: allusersdata.elementAt(index).email,
-                            id: allusersdata.elementAt(index).userID,
-                            profileImage: 'NA'),
+                          userName: data.name,
+                          email: data.email,
+                          id: data.userID,
+                          profileImage: 'NA',
+                        ),
                       )));
-          getchattedmessages();
+          if (!mounted) return;
+          setState(() {});
         },
         onLongPress: () {},
       ),
     );
   }
 
-  Future<void> getchattedmessages() async {
-    await UserData.getUserdetails();
-    DocumentSnapshot data = await FirebaseFirestore.instance.collection("messages").doc(UserData.userdetails?.userID).get();
-    String details = data.data().toString();
-    Object? temp = data.data();
-    Map tempData = jsonDecode(jsonEncode(temp));
-    List<dynamic> abc = tempData.values.toList();
-    for (var i = 0; i < abc.length; i++) {
-      String userUID = abc.elementAt(i).toString();
-      // QuerySnapshot result = await DatabaseMethods().getUserInfo(userUID);
-      // UserDetailsmodal userdetails = UserDetailsmodal.parseResponse(result.docs.map((e) => e.data()).toList().elementAt(0));
-      await FirebaseFirestore.instance
-          .collection("messages")
-          .doc(UserData.userdetails?.userID)
-          .collection(userUID)
-          .orderBy(MsgConst.messageSentTime, descending: true)
-          .get()
-          .then((v) {
-        TimeOfDay time = (TimeOfDay(
-            hour: DateTime.parse(v.docs[0].data()[MsgConst.messageSentTime]).hour, minute: DateTime.parse(v.docs[0].data()[MsgConst.messageSentTime]).minute));
-
-        UserData.messagesList.add(MainpageChatModal(
-            userID: userUID,
-            name: "userdetails.name",
-            profileImage: "userdetails.profileImage",
-            lastMessage: v.docs[0].data()[MsgConst.messageContent],
-            lastMessageTime: timeConversion(time),
-            email: "userdetails.email"));
-      });
-    }
-    allusersdata = UserData.messagesList;
-    if (!mounted) return;
-    setState(() {});
-
-    // print(temp);
-  }
-
   String timeConversion(TimeOfDay time) {
     String hour = ((time.hour > 12) ? time.hour - 12 : time.hour).toString();
+    hour = hour == "0" ? "12" : hour;
     String formate = ((time.hour >= 12) ? "pm" : "am");
     if (hour.length == 1) hour = "0$hour";
     String min = time.minute.toString();
     if (min.length == 1) min = "0$min";
     return "$hour:$min $formate";
+  }
+
+  Future<void> setMessagesCount(String id, int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (!prefs.containsKey(id)) {
+      prefs.setInt(id, value);
+    }
+  }
+
+  void getMessagesCount(List<String> id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var i in id) {
+      if (!UserData.usersChatCount.map((e) => e.userUID).toList().contains(i)) UserData.usersChatCount.add(UserChatCount(i, prefs.getInt(i) ?? 0));
+    }
+    // if (!mounted) return;
+    // setState(() {});
   }
 }

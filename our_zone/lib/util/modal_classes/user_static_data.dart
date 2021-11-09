@@ -5,11 +5,18 @@ import 'user_modal.dart';
 
 class UserData {
   static UserDetailsmodal? userdetails;
-  static  List<MainpageChatModal> messagesList = List<MainpageChatModal>.empty(growable: true);
+  static List<MainpageChatModal> messagesList = List<MainpageChatModal>.empty(growable: true);
+  static List<UserChatCount> usersChatCount = List<UserChatCount>.empty(growable: true);
 
   static Future getUserdetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userUID = prefs.getString("user_login_id") ?? "";
-
   }
+}
+
+class UserChatCount {
+  String userUID;
+  int messageCount;
+
+  UserChatCount(this.userUID, this.messageCount);
 }

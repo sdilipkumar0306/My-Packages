@@ -18,6 +18,19 @@ class DatabaseMethods {
     }
   }
 
+  Future<Map<String, dynamic>> getLastMsg(String uid) async {
+    QuerySnapshot<Map<String, dynamic>> response = await FirebaseFirestore.instance
+        .collection(FbC.user)
+        .doc(UserData.userdetails?.userID)
+        .collection(FbC.chats)
+        .doc(uid)
+        .collection(FbC.messages)
+        .orderBy(MsgConst.messageSentTime, descending: true)
+        .get();
+
+    return (response.docs.first.data());
+  }
+
   Future<UserDetailsmodal?> getUserDetails(String uid) async {
     UserDetailsmodal? userdata;
     try {
@@ -46,15 +59,17 @@ class DatabaseMethods {
     }
   }
 
-  String? createMessage(CreateMessageModal data, bool isFirst) {
-    print("user idddddddd ${UserData.userdetails?.userID}");
-    FirebaseFirestore.instance
+  Future<String?> createMessage(CreateMessageModal data, int msgCount, String name) async {
+    DocumentReference response = await FirebaseFirestore.instance
         .collection(FbC.user)
         .doc(UserData.userdetails?.userID)
         .collection(FbC.chats)
         .doc(data.messageTo)
         .collection(FbC.messages)
         .add(data.createMessageMap());
+
+    data.messageID = response.id;
+
     FirebaseFirestore.instance
         .collection(FbC.user)
         .doc(data.messageTo)
@@ -62,19 +77,37 @@ class DatabaseMethods {
         .doc(UserData.userdetails?.userID)
         .collection(FbC.messages)
         .add(data.createMessageMap());
-    if (isFirst) {
-      FirebaseFirestore.instance
-          .collection(FbC.user)
-          .doc(data.messageTo)
-          .collection(FbC.chats)
-          .doc(UserData.userdetails?.userID)
-          .set({"chat": "Started", "isFriend": "REQUESTED"});
-      FirebaseFirestore.instance
-          .collection(FbC.user)
-          .doc(UserData.userdetails?.userID)
-          .collection(FbC.chats)
-          .doc(data.messageTo)
-          .set({"chat": "Started", "isFriend": "REQUESTED"});
-    }
+    // if (isFirst) {
+    FirebaseFirestore.instance.collection(FbC.user).doc(data.messageTo).collection(FbC.chats).doc(UserData.userdetails?.userID).set({
+      UserConstants.userName: UserData.userdetails?.name,
+      "last_message": data.messageContent,
+      "last_msg_time": data.messageSentTime,
+      "message_count": msgCount,
+    });
+    FirebaseFirestore.instance.collection(FbC.user).doc(UserData.userdetails?.userID).collection(FbC.chats).doc(data.messageTo).set({
+      UserConstants.userName: name,
+      "last_message": data.messageContent,
+      "last_msg_time": data.messageSentTime,
+      "message_count": msgCount,
+    });
+    // }
+  }
+
+  String? setMsgSeen(String uid, CreateMessageModal id) {
+    // FirebaseFirestore.instance
+    //     .collection(FbC.user)
+    //     .doc(UserData.userdetails?.userID)
+    //     .collection(FbC.chats)
+    //     .doc(uid)
+    //     .collection(FbC.messages)
+    //     .doc(id).set({MsgConst.messageStatus:"SEEN"});
+    FirebaseFirestore.instance
+        .collection(FbC.user)
+        .doc(uid)
+        .collection(FbC.chats)
+        .doc(UserData.userdetails?.userID)
+        .collection(FbC.messages)
+        .doc(id.messageID)
+        .set(id.createMessageMap());
   }
 }

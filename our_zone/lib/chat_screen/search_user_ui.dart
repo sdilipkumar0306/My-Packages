@@ -134,7 +134,7 @@ class _SearchUserUIState extends State<SearchUserUI> {
     return Card(
       child: ListTile(
         title: Text(filteruserData.elementAt(index).userName),
-        subtitle: Text(filteruserData.elementAt(index).email),
+        // subtitle: Text(filteruserData.elementAt(index).email),
         minLeadingWidth: 50,
         leading: Container(
           width: 50,

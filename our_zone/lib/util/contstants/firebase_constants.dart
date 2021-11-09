@@ -7,6 +7,7 @@ class MsgConst {
   static const String messageID = "message_id";
   static const String messageReplayID = "message_replay_id";
   static const String chatType = "chat_type";
+  static const String messageStatus = "message_status";
 }
 
 class FbC {

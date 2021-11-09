@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:our_zone/util/modal_classes/response.dart';
 import 'package:our_zone/util/modal_classes/user_static_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,14 +21,14 @@ class AuthService {
     }
   }
 
-  Future signUpWithEmailAndPassword(String email, String password) async {
+  Future<OurZoneResponse> signUpWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      return _userFromFirebaseUser(result);
+      return OurZoneResponse(code: 200, response: _userFromFirebaseUser(result));
     } catch (e) {
       // ignore: avoid_print
       print("signUpWithEmailAndPassword errorr ---- $e");
-      return null;
+      return OurZoneResponse(code: 201, response: e.toString());
     }
   }
 

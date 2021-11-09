@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:our_zone/home/home_main.dart';
 import 'package:our_zone/util/contstants/firebase_constants.dart';
 import 'package:our_zone/util/modal_classes/firebase_modal.dart';
+import 'package:our_zone/util/modal_classes/response.dart';
 import 'package:our_zone/util/modal_classes/user_static_data.dart';
 import 'package:our_zone/util/services/db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -506,14 +507,14 @@ class _LogInRegisterUIState extends State<LogInRegisterUI> with InputValidationM
       CreateUser newUser = CreateUser(userID: "NA", name: lg.nameController.text, email: lg.emailController.text);
       CommonService.snackbar(context, "Loading Please wait....");
 
-      User? result = await authService.signUpWithEmailAndPassword(newUser.email, lg.passwordController.text);
-      if (result != null) {
+      OurZoneResponse? response = await authService.signUpWithEmailAndPassword(newUser.email, lg.passwordController.text);
+      if (response.code == 200) {
+        User result = response.response;
         newUser.userID = result.uid;
         String? returResponse = DatabaseMethods().createUserInFirebase(newUser);
-        print(returResponse);
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("user_login_id", result.uid);
-        prefs.setString("user_email", newUser.email);
+        prefs.setString(UserConstants.userID, result.uid);
+        prefs.setString(UserConstants.userEmail, newUser.email);
         UserData.userdetails?.userID = result.uid;
         UserData.userdetails?.email = newUser.email;
         UserData.userdetails?.name = newUser.name;
@@ -522,9 +523,10 @@ class _LogInRegisterUIState extends State<LogInRegisterUI> with InputValidationM
         CommonService.hideSnackbar(context);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeMain()));
       } else {
+        CommonService.hideSnackbar(context);
         setState(() {
           lg.enableButton = true;
-          lg.passwoedError = "Un error Try after sometime..";
+          lg.passwoedError = "Email already taken..";
         });
       }
     }
@@ -551,8 +553,6 @@ class _LogInRegisterUIState extends State<LogInRegisterUI> with InputValidationM
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString(UserConstants.userID, result.uid);
         prefs.setString(UserConstants.userEmail, lg.emailController.text);
-
-   
 
         CommonService.hideSnackbar(context);
 
