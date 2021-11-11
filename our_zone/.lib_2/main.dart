@@ -1,8 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:our_zone/util/constants/ui_constants.dart';
 
-import 'screens/splash_screens/splash_screen.dart';
+import 'splash_screen/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,11 +17,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: UiConstants.appName,
+      title: 'Our Zone',
       theme: ThemeData(
         primarySwatch: Colors.cyan,
       ),
-      home: const SplashScreenUI(),
+      home: const MyCustomSplashScreen(),
     );
   }
 }
