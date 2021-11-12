@@ -16,6 +16,6 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
 
   @override
   Widget build(BuildContext context) {
-    return const UserChatList();
+    return const UserChatListUI();
   }
 }

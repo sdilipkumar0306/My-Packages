@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:our_zone/screens/login_register_pages/login_register_ui.dart';
 import 'package:our_zone/screens/main_screens/home_screen/home_ui.dart';
+import 'package:our_zone/util/constants/conversion.dart';
 import 'package:our_zone/util/constants/firebase_constants.dart';
 import 'package:our_zone/util/constants/ui_constants.dart';
 import 'package:our_zone/util/modals/firebase_modals.dart';
@@ -24,7 +25,6 @@ class _SplashScreenUIState extends State<SplashScreenUI> {
   @override
   void initState() {
     getUserData();
-
     super.initState();
   }
 
@@ -73,5 +73,4 @@ class _SplashScreenUIState extends State<SplashScreenUI> {
       ),
     );
   }
-
 }

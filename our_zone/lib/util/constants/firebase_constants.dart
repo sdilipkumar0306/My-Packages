@@ -14,6 +14,9 @@ class MsgConst {
   static const String lastMsg = "last_message";
   static const String lastMsgTime = "last_msg_time";
   static const String msgCount = "message_count";
+  static const String isPinned = "is_pinned";
+  static const String isMuted = "is_muted";
+  static const String isAchived = "is_achived";
 }
 
 class FbC {

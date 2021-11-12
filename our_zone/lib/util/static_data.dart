@@ -5,4 +5,5 @@ class UserData {
   static FBUser? primaryUser;
   static FBUser? secondaryUser;
   static List<UserChatCount> usersChatCount = List<UserChatCount>.empty(growable: true);
+  static List<UserChatList> userChatList = List<UserChatList>.empty(growable: true);
 }

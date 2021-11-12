@@ -89,28 +89,41 @@ class UserChatList {
   String userName;
   String lastMsg;
   String lastMsgTime;
+  String profileImage;
   int msgCount;
+  bool isSelected;
+  bool isPinned;
+  bool isMuted;
+  bool isAchived;
 
   UserChatList({
     required this.userId,
     required this.userName,
     required this.lastMsg,
     required this.lastMsgTime,
+    required this.profileImage,
     required this.msgCount,
+    this.isPinned = false,
+    this.isMuted = false,
+    this.isAchived = false,
+    this.isSelected = false,
   });
 
   factory UserChatList.parseResponse(dynamic data) {
     return UserChatList(
-      userId: data[UserConst.userID],
-      userName: data[UserConst.userName],
-      lastMsg: data[MsgConst.lastMsg],
-      lastMsgTime: data[MsgConst.lastMsgTime],
-      msgCount: data[MsgConst.msgCount],
+      userId: data[UserConst.userID] ?? "NA",
+      userName: data[UserConst.userName] ?? "NA",
+      lastMsg: data[MsgConst.lastMsg] ?? "NA",
+      lastMsgTime: data[MsgConst.lastMsgTime] ?? "NA",
+      profileImage: data[UserConst.userProfileImage] ?? "NA",
+      msgCount: int.parse((data[MsgConst.msgCount] ?? 0).toString()),
     );
   }
 
   Map<String, dynamic> getuserChatListMap() => {
+        UserConst.userID: userId,
         UserConst.userName: userName,
+        UserConst.userProfileImage: profileImage,
         MsgConst.lastMsg: lastMsg,
         MsgConst.lastMsgTime: lastMsgTime,
         MsgConst.msgCount: msgCount,

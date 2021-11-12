@@ -25,22 +25,13 @@ class GetAllUsersResponseData {
   }
 }
 
-class MainpageChatModal {
-  String userID;
-  String name;
-  String email;
-  String profileImage;
-  String lastMessage;
-  String lastMessageTime;
-  int msgCount;
+class GetUserChatListResponse {
+  List<UserChatList> userChatList;
 
-  MainpageChatModal({
-    required this.userID,
-    required this.name,
-    required this.email,
-    required this.profileImage,
-    required this.lastMessage,
-    required this.lastMessageTime,
-    required this.msgCount,
-  });
+  GetUserChatListResponse({required this.userChatList});
+
+  factory GetUserChatListResponse.parseUserChatListResponse(List<dynamic> data) {
+    return GetUserChatListResponse(userChatList: data.map((e) => UserChatList.parseResponse(e)).toList());
+  }
 }
+

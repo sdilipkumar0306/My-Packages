@@ -64,10 +64,18 @@ class DatabaseMethods {
     // saving msg on secondary user side with msgId of primary inserted msg id
     getInstance(sUID, pUID).collection(FbC.messages).add(data.createMessageMap());
     UserChatList lastMsgDetails = UserChatList(
-        userId: "", userName: UserData.primaryUser?.name ?? "", lastMsg: data.messageContent, lastMsgTime: data.messageSentTime, msgCount: msgCount);
+      userId: pUID,
+      userName: UserData.primaryUser?.name ?? "",
+      profileImage: UserData.primaryUser?.profileImage ?? "",
+      lastMsg: data.messageContent,
+      lastMsgTime: data.messageSentTime,
+      msgCount: msgCount,
+    );
     // setting last lsg on secondary user side
     getInstance(sUID, pUID).set(lastMsgDetails.getuserChatListMap());
     lastMsgDetails.userName = UserData.secondaryUser?.name ?? "";
+    lastMsgDetails.profileImage = UserData.secondaryUser?.profileImage ?? "";
+    lastMsgDetails.userId = sUID;
     // setting last lsg on primary user side
     getInstance(pUID, sUID).set(lastMsgDetails.getuserChatListMap());
   }
@@ -75,5 +83,14 @@ class DatabaseMethods {
   /// required  createMsgModal
   String? setMsgSeen(CreateMessageModal msg) {
     getInstance(sUID, pUID).collection(FbC.messages).doc(msg.messageID).set(msg.createMessageMap());
+  }
+
+  Future<void> deleteChat(String uid) async {
+    getInstance(pUID, uid).delete();
+    QuerySnapshot data = await getInstance(pUID, uid).collection(FbC.messages).get();
+    List<String> ids = data.docs.map((e) => e.id).toList();
+    for (var i in ids) {
+      getInstance(pUID, uid).collection(FbC.messages).doc(i).delete();
+    }
   }
 }

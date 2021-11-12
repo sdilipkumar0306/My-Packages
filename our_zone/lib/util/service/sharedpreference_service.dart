@@ -60,4 +60,41 @@ class SPS {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.remove(key);
   }
+
+  static Future<List<bool>> getUserChatprop(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return [
+      prefs.getBool(key + "_pinned") ?? false,
+      prefs.getBool(key + "_muted") ?? false,
+      prefs.getBool(key + "_achived") ?? false,
+    ];
+  }
+  static Future<void> removeUserChatprop(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove(key + "_pinned");
+      prefs.remove(key + "_muted") ;
+      prefs.remove(key + "_achived");
+  }
+
+  ///  1 -- pinned
+  ///
+  ///  2 -- muted
+  ///
+  ///  3 -- achived
+  static Future<void> setUserChatprop(String key, bool value, int type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    switch (type) {
+      case 1:
+        prefs.setBool(key + "_pinned", value);
+        break;
+      case 2:
+        prefs.setBool(key + "_muted", value);
+        break;
+      case 3:
+        prefs.setBool(key + "_achived", value);
+        break;
+      default:
+        prefs.setBool(key + "_pinned", value);
+    }
+  }
 }
