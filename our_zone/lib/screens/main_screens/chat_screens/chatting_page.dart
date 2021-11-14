@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:our_zone/util/constants/conversion.dart';
 import 'package:our_zone/util/constants/firebase_constants.dart';
+import 'package:our_zone/util/modals/common_modals.dart';
 import 'package:our_zone/util/modals/firebase_modals.dart';
 import 'package:our_zone/util/service/data_base_service.dart';
 import 'package:our_zone/util/static_data.dart';
@@ -119,7 +120,14 @@ class _ChatMainUIState extends State<ChatMainUI> {
                           if (!mounted) return;
                           setState(() {});
                           DatabaseMethods().createMessage(newMsg, (msgLength + 1));
-                          setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength + 1);
+                          setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength);
+                          if (UserData.usersChatCount.isEmpty) {
+                            UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
+                          } else if (!UserData.usersChatCount.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
+                            UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
+                          } else {
+                            UserData.usersChatCount.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).messageCount += 1;
+                          }
                           // if (UserData.usersChatCount.isNotEmpty) {
                           //   UserData.usersChatCount.firstWhere((e) => e.userUID == widget.opponentData.userID).messageCount = msgLength + 1;
                           // }
@@ -171,10 +179,6 @@ class _ChatMainUIState extends State<ChatMainUI> {
                           TimeOfDay time = (TimeOfDay(
                               hour: DateTime.parse(mydata[MsgConst.messageSentTime]).hour, minute: DateTime.parse(mydata[MsgConst.messageSentTime]).minute));
                           setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength);
-                          if (UserData.usersChatCount.isNotEmpty &&
-                              UserData.usersChatCount.map((e) => e.userUID).toList().contains(UserData.secondaryUser?.userID)) {
-                            UserData.usersChatCount.firstWhere((e) => (e.userUID == UserData.secondaryUser?.userID)).messageCount = msgLength;
-                          }
 
                           return MessageTile(
                             message: (mydata != null) ? mydata[MsgConst.messageContent] : "",
@@ -247,6 +251,11 @@ class _ChatMainUIState extends State<ChatMainUI> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     prefs.setInt(id, value);
+    if (UserData.usersChatCount.isNotEmpty && UserData.usersChatCount.map((e) => e.userUID).toList().contains(UserData.secondaryUser?.userID)) {
+      UserData.usersChatCount.firstWhere((e) => (e.userUID == UserData.secondaryUser?.userID)).messageCount = msgLength;
+    } else {
+      UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", msgLength));
+    }
   }
 }
 

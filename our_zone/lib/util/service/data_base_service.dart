@@ -71,11 +71,35 @@ class DatabaseMethods {
       lastMsgTime: data.messageSentTime,
       msgCount: msgCount,
     );
-    // setting last lsg on secondary user side
-    getInstance(sUID, pUID).set(lastMsgDetails.getuserChatListMap());
+    setUserChatCount(lastMsgDetails);
+  }
+
+  Future<void> setUserChatCount(UserChatList lastMsgDetails) async {
+    DocumentSnapshot oppData = await getInstance(sUID, pUID).get();
+    int count = lastMsgDetails.msgCount;
+    if (oppData.data() != null) {
+      UserChatList opponentSideData = UserChatList.parseResponse(oppData.data());
+
+      opponentSideData = UserChatList(
+        userId: lastMsgDetails.userId,
+        userName: lastMsgDetails.userName,
+        lastMsg: lastMsgDetails.lastMsg,
+        lastMsgTime: lastMsgDetails.lastMsgTime,
+        profileImage: opponentSideData.profileImage,
+        msgCount: opponentSideData.msgCount + 1,
+      );
+      // setting last lsg on secondary user side
+      getInstance(sUID, pUID).set(opponentSideData.getuserChatListMap());
+    } else {
+      // setting last lsg on secondary user side
+
+      lastMsgDetails.msgCount = 1;
+      getInstance(sUID, pUID).set(lastMsgDetails.getuserChatListMap());
+    }
     lastMsgDetails.userName = UserData.secondaryUser?.name ?? "";
     lastMsgDetails.profileImage = UserData.secondaryUser?.profileImage ?? "";
     lastMsgDetails.userId = sUID;
+    lastMsgDetails.msgCount = count;
     // setting last lsg on primary user side
     getInstance(pUID, sUID).set(lastMsgDetails.getuserChatListMap());
   }

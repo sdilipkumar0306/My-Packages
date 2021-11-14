@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:our_zone/screens/login_register_pages/login_register_ui.dart';
@@ -6,6 +7,7 @@ import 'package:our_zone/screens/main_screens/home_screen/home_ui.dart';
 import 'package:our_zone/util/constants/conversion.dart';
 import 'package:our_zone/util/constants/firebase_constants.dart';
 import 'package:our_zone/util/constants/ui_constants.dart';
+import 'package:our_zone/util/modals/common_modals.dart';
 import 'package:our_zone/util/modals/firebase_modals.dart';
 import 'package:our_zone/util/service/data_base_service.dart';
 import 'package:our_zone/util/service/sharedpreference_service.dart';
@@ -33,6 +35,14 @@ class _SplashScreenUIState extends State<SplashScreenUI> {
     if (uid != null) {
       FBUser? user = await DatabaseMethods().getUserDetails(uid);
       if (user != null) {
+        String? userChatList = await SPS.getValue("user_chat_list", String) ?? "";
+        if (userChatList != null) {
+          List<dynamic> data = jsonDecode(userChatList);
+          GetUserChatListResponse response = GetUserChatListResponse.parseUserChatListResponse(data);
+          UserData.userChatList = response.userChatList;
+          getmsgUiprop();
+          getmsgCounts();
+        }
         UserData.primaryUser = user;
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreenUI()));
       } else {
@@ -72,5 +82,23 @@ class _SplashScreenUIState extends State<SplashScreenUI> {
         ),
       ),
     );
+  }
+
+  Future<void> getmsgUiprop() async {
+    List<String> ids = UserData.userChatList.map((e) => e.userId).toList();
+    for (var i in ids) {
+      List<bool> response = await SPS.getUserChatprop(i);
+      UserData.userChatList.firstWhere((e) => e.userId == i).isPinned = response[0];
+      UserData.userChatList.firstWhere((e) => e.userId == i).isMuted = response[1];
+      UserData.userChatList.firstWhere((e) => e.userId == i).isAchived = response[2];
+    }
+  }
+
+  Future<void> getmsgCounts() async {
+    List<String> ids = UserData.userChatList.map((e) => e.userId).toList();
+    for (var i in ids) {
+      int? res = await SPS.getValue(i, int);
+      UserData.usersChatCount.add(UserChatCount(i, (res == null) ? 1 : res));
+    }
   }
 }

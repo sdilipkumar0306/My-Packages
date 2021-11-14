@@ -128,4 +128,15 @@ class UserChatList {
         MsgConst.lastMsgTime: lastMsgTime,
         MsgConst.msgCount: msgCount,
       };
+  Map<String, dynamic> saveUserChat() => {
+        UserConst.userID: userId,
+        UserConst.userName: userName,
+        UserConst.userProfileImage: profileImage,
+        MsgConst.lastMsg: lastMsg,
+        MsgConst.lastMsgTime: lastMsgTime,
+        MsgConst.msgCount: msgCount,
+        MsgConst.isPinned:isPinned,
+        MsgConst.isMuted:isMuted,
+        MsgConst.isAchived:isAchived,
+      };
 }
