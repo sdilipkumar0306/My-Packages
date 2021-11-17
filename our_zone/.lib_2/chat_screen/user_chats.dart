@@ -106,7 +106,7 @@ class _ChatMainUIState extends State<ChatMainUI> {
                   child: IconButton(
                       onPressed: () {
                         if (message.text.isNotEmpty) {
-                          CreateMessageModal newMsg = CreateMessageModal(
+                          MessageModal newMsg = MessageModal(
                               messageContent: message.text,
                               messageFrom: UserData.userdetails?.userID ?? "",
                               messageTo: widget.opponentData.id,
@@ -156,7 +156,7 @@ class _ChatMainUIState extends State<ChatMainUI> {
                   if (snapShot.hasData) {
                     if (snapShot.data?.docs != null && (snapShot.data?.docs.isNotEmpty ?? false)) {
                       dynamic tempData = snapShot.data?.docs.first.data();
-                      CreateMessageModal lastMsg = CreateMessageModal.response(tempData);
+                      MessageModal lastMsg = MessageModal.response(tempData);
                       if (lastMsg.messageFrom != UserData.userdetails?.userID) {
                         lastMsg.messageStatus = "SEEN";
                         DatabaseMethods().setMsgSeen(widget.opponentData.id, lastMsg);

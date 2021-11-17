@@ -92,6 +92,15 @@ class _SplashScreenUIState extends State<SplashScreenUI> {
       UserData.userChatList.firstWhere((e) => e.userId == i).isMuted = response[1];
       UserData.userChatList.firstWhere((e) => e.userId == i).isAchived = response[2];
     }
+
+    String? msgResponse = await SPS.getValue("user_chat_messages", String);
+    if (msgResponse != null) {
+      List<dynamic> convertedMsg = jsonDecode(msgResponse);
+
+      GetAllUserChatMessagesList rrResponse = GetAllUserChatMessagesList.parseAllUsersDataResponse(convertedMsg);
+
+      UserData.userChatMessages = rrResponse.userChatMessages;
+    }
   }
 
   Future<void> getmsgCounts() async {

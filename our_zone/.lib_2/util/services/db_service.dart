@@ -59,7 +59,7 @@ class DatabaseMethods {
     }
   }
 
-  Future<String?> createMessage(CreateMessageModal data, int msgCount, String name) async {
+  Future<String?> createMessage(MessageModal data, int msgCount, String name) async {
     DocumentReference response = await FirebaseFirestore.instance
         .collection(FbC.user)
         .doc(UserData.userdetails?.userID)
@@ -93,7 +93,7 @@ class DatabaseMethods {
     // }
   }
 
-  String? setMsgSeen(String uid, CreateMessageModal id) {
+  String? setMsgSeen(String uid, MessageModal id) {
     // FirebaseFirestore.instance
     //     .collection(FbC.user)
     //     .doc(UserData.userdetails?.userID)

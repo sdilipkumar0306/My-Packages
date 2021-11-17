@@ -57,56 +57,92 @@ class DatabaseMethods {
   }
 
   /// required Create Msg modal , present msgCount
-  Future<String?> createMessage(CreateMessageModal data, int msgCount) async {
+  Future<String?> createMessage(MessageModal data, int msgCount) async {
+    MessageModal primaryMsg = data;
+    MessageModal secondaryMsg = data;
     // saving msg in primary user side
-    DocumentReference response = await getInstance(pUID, sUID).collection(FbC.messages).add(data.createMessageMap());
-    data.messageID = response.id;
+    DocumentReference response = await getInstance(pUID, sUID).collection(FbC.messages).add(primaryMsg.createMessageMap());
+    secondaryMsg.messageID = response.id;
     // saving msg on secondary user side with msgId of primary inserted msg id
-    getInstance(sUID, pUID).collection(FbC.messages).add(data.createMessageMap());
-    UserChatList lastMsgDetails = UserChatList(
-      userId: pUID,
-      userName: UserData.primaryUser?.name ?? "",
-      profileImage: UserData.primaryUser?.profileImage ?? "",
+    DocumentReference secondaryresponse = await getInstance(sUID, pUID).collection(FbC.messages).add(secondaryMsg.createMessageMap());
+    primaryMsg.messageSecondaryID = secondaryresponse.id;
+    SetOptions options = SetOptions(mergeFields: [MsgConst.messageSecondaryID]);
+    await getInstance(pUID, sUID).collection(FbC.messages).doc(response.id).set(primaryMsg.createMessageMap(), options);
+    UserChatList plastMsgDetails = UserChatList(
+      userId: sUID,
+      userName: UserData.secondaryUser?.name ?? "",
+      profileImage: UserData.secondaryUser?.profileImage ?? "",
       lastMsg: data.messageContent,
       lastMsgTime: data.messageSentTime,
       msgCount: msgCount,
+      seenMsgCount: msgCount,
     );
-    setUserChatCount(lastMsgDetails);
+    setUserChatCount(plastMsgDetails);
   }
 
   Future<void> setUserChatCount(UserChatList lastMsgDetails) async {
+    getInstance(pUID, sUID).set(lastMsgDetails.getuserChatListMap());
+
     DocumentSnapshot oppData = await getInstance(sUID, pUID).get();
-    int count = lastMsgDetails.msgCount;
     if (oppData.data() != null) {
       UserChatList opponentSideData = UserChatList.parseResponse(oppData.data());
-
       opponentSideData = UserChatList(
-        userId: lastMsgDetails.userId,
-        userName: lastMsgDetails.userName,
+        userId: opponentSideData.userId,
+        userName: opponentSideData.userName,
         lastMsg: lastMsgDetails.lastMsg,
         lastMsgTime: lastMsgDetails.lastMsgTime,
         profileImage: opponentSideData.profileImage,
         msgCount: opponentSideData.msgCount + 1,
+        seenMsgCount: opponentSideData.seenMsgCount,
       );
+      SetOptions options2 = SetOptions(mergeFields: [MsgConst.lastMsg, MsgConst.lastMsgTime, MsgConst.msgCount]);
+
       // setting last lsg on secondary user side
-      getInstance(sUID, pUID).set(opponentSideData.getuserChatListMap());
+      getInstance(sUID, pUID).set(opponentSideData.getuserChatListMap(), options2);
     } else {
       // setting last lsg on secondary user side
-
-      lastMsgDetails.msgCount = 1;
-      getInstance(sUID, pUID).set(lastMsgDetails.getuserChatListMap());
+      UserChatList opponentSideData = lastMsgDetails;
+      opponentSideData.msgCount = 1;
+      opponentSideData.userId = pUID;
+      opponentSideData.profileImage = UserData.primaryUser?.profileImage ?? "";
+      opponentSideData.userName = UserData.primaryUser?.name ?? "";
+      opponentSideData.seenMsgCount = 0;
+      getInstance(sUID, pUID).set(opponentSideData.getuserChatListMap());
     }
-    lastMsgDetails.userName = UserData.secondaryUser?.name ?? "";
-    lastMsgDetails.profileImage = UserData.secondaryUser?.profileImage ?? "";
-    lastMsgDetails.userId = sUID;
-    lastMsgDetails.msgCount = count;
+
     // setting last lsg on primary user side
-    getInstance(pUID, sUID).set(lastMsgDetails.getuserChatListMap());
+  }
+
+  void setPrimaryUserMsgCount(UserChatList msdData) {
+    SetOptions options = SetOptions(mergeFields: [MsgConst.lastMsg, MsgConst.lastMsgTime, MsgConst.msgCount, MsgConst.seenMsgCount]);
+    getInstance(pUID, sUID).set(msdData.getuserChatListMap(), options);
+  }
+
+  Future<void> setSecondaryUserMsgCount(String userId) async {
+    SetOptions options = SetOptions(mergeFields: [MsgConst.lastMsg, MsgConst.lastMsgTime, MsgConst.msgCount, MsgConst.seenMsgCount]);
+    DocumentSnapshot oppData = await getInstance(userId, pUID).get();
+
+    QuerySnapshot<Map<String, dynamic>> response =
+        await getInstance(userId, pUID).collection(FbC.messages).orderBy(MsgConst.messageSentTime, descending: true).get();
+    int length = response.docs.length;
+    MessageModal lastMsg = MessageModal.response(response.docs.first.data());
+
+    if (oppData.data() != null) {
+      UserChatList msdData = UserChatList.parseResponse(oppData.data());
+      msdData.lastMsg = lastMsg.messageContent;
+      msdData.lastMsgTime = lastMsg.messageSentTime;
+      msdData.msgCount = length;
+      getInstance(pUID, sUID).set(msdData.getuserChatListMap(), options);
+    }
   }
 
   /// required  createMsgModal
-  String? setMsgSeen(CreateMessageModal msg) {
-    getInstance(sUID, pUID).collection(FbC.messages).doc(msg.messageID).set(msg.createMessageMap());
+  Future<String?> setMsgSeen(MessageModal msg) async {
+    SetOptions setOptions = SetOptions(mergeFields: [MsgConst.messageStatus]);
+    DocumentSnapshot<Map<String, dynamic>> isIds = await getInstance(sUID, pUID).collection(FbC.messages).doc(msg.messageID).get();
+    if (isIds.data() != null) {
+      getInstance(sUID, pUID).collection(FbC.messages).doc(msg.messageID).set(msg.createMessageMap(), setOptions);
+    }
   }
 
   Future<void> deleteChat(String uid) async {
@@ -116,5 +152,17 @@ class DatabaseMethods {
     for (var i in ids) {
       getInstance(pUID, uid).collection(FbC.messages).doc(i).delete();
     }
+  }
+
+  Future<bool> deleteChatMessages(List<String> pIds, List<String> sIds, bool isForBoth) async {
+    for (var i in pIds) {
+      await getInstance(pUID, sUID).collection(FbC.messages).doc(i).delete();
+    }
+    if (isForBoth) {
+      for (var i in sIds) {
+        await getInstance(sUID, pUID).collection(FbC.messages).doc(i).delete();
+      }
+    }
+    return true;
   }
 }

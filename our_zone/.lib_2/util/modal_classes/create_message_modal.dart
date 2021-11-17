@@ -1,4 +1,4 @@
-class CreateMessageModal {
+class MessageModal {
   String messageContent;
   String messageFrom;
   String messageTo;
@@ -9,7 +9,7 @@ class CreateMessageModal {
   String chatType;
   String messageStatus;
 
-  CreateMessageModal({
+  MessageModal({
     required this.messageContent,
     required this.messageFrom,
     required this.messageTo,
@@ -21,8 +21,8 @@ class CreateMessageModal {
     required this.messageStatus,
   });
 
-  factory CreateMessageModal.response(dynamic data) {
-    return CreateMessageModal(
+  factory MessageModal.response(dynamic data) {
+    return MessageModal(
       messageContent: data["message_content"],
       messageFrom: data["message_from"],
       messageTo: data["message_to"],

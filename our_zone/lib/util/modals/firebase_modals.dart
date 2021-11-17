@@ -1,36 +1,41 @@
 import 'package:our_zone/util/constants/firebase_constants.dart';
 
-class CreateMessageModal {
+class MessageModal {
   String messageContent;
   String messageFrom;
   String messageTo;
   String messageType;
   String messageSentTime;
   String messageID;
+  String messageSecondaryID;
   String messageReplayID;
   String chatType;
   String messageStatus;
+  bool isSelected;
 
-  CreateMessageModal({
+  MessageModal({
     required this.messageContent,
     required this.messageFrom,
     required this.messageTo,
     required this.messageType,
     required this.messageSentTime,
     required this.messageID,
+    required this.messageSecondaryID,
     required this.messageReplayID,
     required this.chatType,
     required this.messageStatus,
+    this.isSelected = false,
   });
 
-  factory CreateMessageModal.response(dynamic data) {
-    return CreateMessageModal(
+  factory MessageModal.response(dynamic data) {
+    return MessageModal(
       messageContent: data[MsgConst.messageContent],
       messageFrom: data[MsgConst.messageFrom],
       messageTo: data[MsgConst.messageTo],
       messageType: data[MsgConst.messageType],
       messageSentTime: data[MsgConst.messageSentTime],
       messageID: data[MsgConst.messageID],
+      messageSecondaryID: data[MsgConst.messageSecondaryID],
       messageReplayID: data[MsgConst.messageReplayID],
       chatType: data[MsgConst.chatType],
       messageStatus: data[MsgConst.messageStatus],
@@ -44,6 +49,7 @@ class CreateMessageModal {
         MsgConst.messageType: messageType,
         MsgConst.messageSentTime: messageSentTime,
         MsgConst.messageID: messageID,
+        MsgConst.messageSecondaryID: messageSecondaryID,
         MsgConst.messageReplayID: messageReplayID,
         MsgConst.chatType: chatType,
         MsgConst.messageStatus: messageStatus,
@@ -91,6 +97,7 @@ class UserChatList {
   String lastMsgTime;
   String profileImage;
   int msgCount;
+  int seenMsgCount;
   bool isSelected;
   bool isPinned;
   bool isMuted;
@@ -103,6 +110,7 @@ class UserChatList {
     required this.lastMsgTime,
     required this.profileImage,
     required this.msgCount,
+    required this.seenMsgCount,
     this.isPinned = false,
     this.isMuted = false,
     this.isAchived = false,
@@ -117,6 +125,7 @@ class UserChatList {
       lastMsgTime: data[MsgConst.lastMsgTime] ?? "NA",
       profileImage: data[UserConst.userProfileImage] ?? "NA",
       msgCount: int.parse((data[MsgConst.msgCount] ?? 0).toString()),
+      seenMsgCount: int.parse((data[MsgConst.seenMsgCount] ?? 0).toString()),
     );
   }
 
@@ -127,6 +136,7 @@ class UserChatList {
         MsgConst.lastMsg: lastMsg,
         MsgConst.lastMsgTime: lastMsgTime,
         MsgConst.msgCount: msgCount,
+        MsgConst.seenMsgCount: seenMsgCount,
       };
   Map<String, dynamic> saveUserChat() => {
         UserConst.userID: userId,
@@ -135,8 +145,9 @@ class UserChatList {
         MsgConst.lastMsg: lastMsg,
         MsgConst.lastMsgTime: lastMsgTime,
         MsgConst.msgCount: msgCount,
-        MsgConst.isPinned:isPinned,
-        MsgConst.isMuted:isMuted,
-        MsgConst.isAchived:isAchived,
+        MsgConst.seenMsgCount: seenMsgCount,
+        MsgConst.isPinned: isPinned,
+        MsgConst.isMuted: isMuted,
+        MsgConst.isAchived: isAchived,
       };
 }

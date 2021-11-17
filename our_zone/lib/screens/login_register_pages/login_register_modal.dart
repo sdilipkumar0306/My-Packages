@@ -9,8 +9,8 @@ class LoginGegister {
   double containerSize = 50;
 
   TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController(text: "dilipkumar03061998@gmail.com");
+  TextEditingController passwordController = TextEditingController(text: "1437131415");
 
   String? userNameError;
   String? emmailError;

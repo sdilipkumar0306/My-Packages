@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:our_zone/util/constants/conversion.dart';
 import 'package:our_zone/util/constants/firebase_constants.dart';
+import 'package:our_zone/util/constants/ui_constants.dart';
 import 'package:our_zone/util/modals/common_modals.dart';
 import 'package:our_zone/util/modals/firebase_modals.dart';
 import 'package:our_zone/util/service/data_base_service.dart';
+import 'package:our_zone/util/service/sharedpreference_service.dart';
 import 'package:our_zone/util/static_data.dart';
+import 'package:our_zone/util/widgets_ui/chat_screen_widgets.dart';
+import 'package:our_zone/util/widgets_ui/my_alert_box.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,41 +27,112 @@ class _ChatMainUIState extends State<ChatMainUI> {
   Size size = const Size(0, 0);
   TextEditingController message = TextEditingController();
   int msgLength = 0;
+  List<MessageModal> allMsgs = List<MessageModal>.empty(growable: true);
+  bool isMsgSelected = false;
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> querySnapshots = FirebaseFirestore.instance
+      .collection(FbC.user)
+      .doc(UserData.primaryUser?.userID)
+      .collection(FbC.chats)
+      .doc(UserData.secondaryUser?.userID)
+      .collection(FbC.messages)
+      .orderBy(MsgConst.messageSentTime, descending: true)
+      .snapshots();
+
+  List<IconData> chatScreenIcons = [
+    Icons.reply,
+    Icons.delete,
+    Icons.copy,
+    Icons.forward,
+  ];
+
+  List<QueryDocumentSnapshot<Object?>> queryResponse = List<QueryDocumentSnapshot<Object?>>.empty(growable: true);
+
+  @override
+  void initState() {
+    cancleIcon();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
-              child: const Center(child: Icon(Icons.person)),
-            ),
-            const SizedBox(width: 20),
-            Text(UserData.secondaryUser?.name ?? ""),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () async {},
-            icon: const Icon(Icons.more_vert_rounded),
-            splashRadius: 10,
-          ),
-        ],
-        leadingWidth: 30,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_ios_new),
-          splashRadius: 10,
-        ),
-      ),
+      appBar: isMsgSelected
+          ? AppBar(
+              backgroundColor: UiConstants.myColor,
+              centerTitle: true,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: Text(
+                        UserData.userChatMessages
+                            .firstWhere((e) => e.userUID == UserData.secondaryUser?.userID)
+                            .message
+                            .where((e) => e.isSelected == true)
+                            .toList()
+                            .length
+                            .toString(),
+                        style: const TextStyle(color: UiConstants.appBarElementsColor),
+                      )),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(
+                        chatScreenIcons.length,
+                        (index) => ChatScreenIcons(
+                              icon: chatScreenIcons.elementAt(index),
+                              onpressed: () {
+                                appBarFunctions(index);
+                              },
+                            )),
+                  ),
+                ],
+              ),
+              // actions: [
+              //   ChatScreenIcons(icon: Icons.more_vert_rounded, onpressed: () {}),
+              // ],
+              leading: ChatScreenIcons(
+                  icon: Icons.close_outlined,
+                  onpressed: () {
+                    cancleIcon();
+                  }),
+            )
+          : AppBar(
+              backgroundColor: UiConstants.myColor,
+              title: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+                    child: const Center(child: Icon(Icons.person)),
+                  ),
+                  const SizedBox(width: 20),
+                  Text(
+                    UserData.secondaryUser?.name ?? "",
+                    style: const TextStyle(color: UiConstants.appBarElementsColor),
+                  ),
+                ],
+              ),
+              actions: [
+                ChatScreenIcons(
+                  icon: Icons.more_vert_rounded,
+                  onpressed: () {},
+                )
+              ],
+              leadingWidth: 30,
+              leading: ChatScreenIcons(
+                  icon: Icons.arrow_back_ios_new,
+                  onpressed: () {
+                    Navigator.pop(context);
+                  })),
       bottomSheet: Container(
         height: 60,
         color: Colors.white,
@@ -105,33 +182,7 @@ class _ChatMainUIState extends State<ChatMainUI> {
               child: Center(
                   child: IconButton(
                       onPressed: () {
-                        if (message.text.isNotEmpty) {
-                          CreateMessageModal newMsg = CreateMessageModal(
-                              messageContent: message.text,
-                              messageFrom: UserData.primaryUser?.userID ?? "",
-                              messageTo: UserData.secondaryUser?.userID ?? "",
-                              messageType: "TEXT",
-                              messageSentTime: DateTime.now().toString(),
-                              messageID: "NA",
-                              messageReplayID: "NA",
-                              chatType: "INDIVIDUAL",
-                              messageStatus: "SENT");
-                          message.clear();
-                          if (!mounted) return;
-                          setState(() {});
-                          DatabaseMethods().createMessage(newMsg, (msgLength + 1));
-                          setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength);
-                          if (UserData.usersChatCount.isEmpty) {
-                            UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
-                          } else if (!UserData.usersChatCount.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
-                            UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
-                          } else {
-                            UserData.usersChatCount.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).messageCount += 1;
-                          }
-                          // if (UserData.usersChatCount.isNotEmpty) {
-                          //   UserData.usersChatCount.firstWhere((e) => e.userUID == widget.opponentData.userID).messageCount = msgLength + 1;
-                          // }
-                        }
+                        createNewMsg();
                       },
                       icon: const Icon(
                         Icons.send_rounded,
@@ -151,40 +202,66 @@ class _ChatMainUIState extends State<ChatMainUI> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 65),
             child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection(FbC.user)
-                    .doc(UserData.primaryUser?.userID)
-                    .collection(FbC.chats)
-                    .doc(UserData.secondaryUser?.userID)
-                    .collection(FbC.messages)
-                    .orderBy(MsgConst.messageSentTime, descending: true)
-                    .snapshots(),
+                stream: querySnapshots,
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
-                    if (snapShot.data?.docs != null && (snapShot.data?.docs.isNotEmpty ?? false)) {
-                      dynamic tempData = snapShot.data?.docs.first.data();
-                      CreateMessageModal lastMsg = CreateMessageModal.response(tempData);
-                      if (lastMsg.messageFrom != UserData.primaryUser?.userID) {
-                        lastMsg.messageStatus = "SEEN";
-                        DatabaseMethods().setMsgSeen(lastMsg);
-                      }
+                    buildLoadingFunction(snapShot.data?.docs);
+                    if (UserData.userChatMessages.isNotEmpty) {
+                      allMsgs = UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message;
                     }
-
                     return ListView.builder(
                         reverse: true,
                         itemCount: snapShot.data?.docs.length,
                         itemBuilder: (context, index) {
                           msgLength = snapShot.data?.docs.length ?? 0;
                           dynamic mydata = snapShot.data?.docs[index].data();
-                          TimeOfDay time = (TimeOfDay(
-                              hour: DateTime.parse(mydata[MsgConst.messageSentTime]).hour, minute: DateTime.parse(mydata[MsgConst.messageSentTime]).minute));
                           setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength);
 
+                          // MessageModal message = MessageModal.response(mydata);
                           return MessageTile(
-                            message: (mydata != null) ? mydata[MsgConst.messageContent] : "",
-                            sendByMe: (mydata[MsgConst.messageFrom]) == UserData.primaryUser?.userID ? true : false,
-                            time: time,
-                            status: (index == 0) ? mydata[MsgConst.messageStatus] : null,
+                            message: allMsgs.elementAt(index),
+                            status: (index == 0) ? allMsgs.elementAt(index).messageStatus : null,
+                            selectedColor: allMsgs.elementAt(index).isSelected ? Colors.cyan.shade100 : null,
+                            onLongPress: () {
+                              UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.elementAt(index).isSelected =
+                                  !UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.elementAt(index).isSelected;
+
+                              if (UserData.userChatMessages
+                                  .firstWhere((e) => e.userUID == UserData.secondaryUser?.userID)
+                                  .message
+                                  .map((e) => e.isSelected)
+                                  .toList()
+                                  .contains(true)) {
+                                isMsgSelected = true;
+                              } else {
+                                isMsgSelected = false;
+                              }
+
+                              setState(() {});
+                            },
+                            onTap: () {
+                              if (isMsgSelected) {
+                                UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.elementAt(index).isSelected =
+                                    !UserData.userChatMessages
+                                        .firstWhere((e) => e.userUID == UserData.secondaryUser?.userID)
+                                        .message
+                                        .elementAt(index)
+                                        .isSelected;
+
+                                if (UserData.userChatMessages
+                                    .firstWhere((e) => e.userUID == UserData.secondaryUser?.userID)
+                                    .message
+                                    .map((e) => e.isSelected)
+                                    .toList()
+                                    .contains(true)) {
+                                  isMsgSelected = true;
+                                } else {
+                                  isMsgSelected = false;
+                                }
+
+                                setState(() {});
+                              }
+                            },
                           );
                         });
                   } else if (snapShot.hasError) {
@@ -209,106 +286,154 @@ class _ChatMainUIState extends State<ChatMainUI> {
     );
   }
 
-  Widget chatListtile({
-    required String title,
-    required String lastText,
-    required int count,
-  }) {
-    return Card(
-      child: ListTile(
-        title: Text(title),
-        subtitle: Text(lastText),
-        minLeadingWidth: 50,
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
-          child: const Center(child: Icon(Icons.person)),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(DTconversion.timeConversion(TimeOfDay.now())),
-            Container(
-              width: 25,
-              height: 25,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.cyan),
-              child: Center(
-                child: Text(
-                  "$count",
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ),
-            const SizedBox()
-          ],
-        ),
-      ),
-    );
+  void buildLoadingFunction(List<QueryDocumentSnapshot<Object?>>? qResponse) {
+    if (qResponse != null && qResponse.isNotEmpty) {
+      queryResponse = qResponse;
+      dynamic tempData = qResponse.first.data();
+      MessageModal lastMsg = MessageModal.response(tempData);
+      if (lastMsg.messageFrom != UserData.primaryUser?.userID) {
+        lastMsg.messageStatus = "SEEN";
+        lastMsg.chatType = "IND";
+        DatabaseMethods().setMsgSeen(lastMsg);
+      }
+      GetAllUsersMessageModal response = GetAllUsersMessageModal.parseAllUsersDataResponse(qResponse.map((e) => e.data()).toList());
+
+      if (UserData.userChatMessages.isEmpty) {
+        UserData.userChatMessages.add(UserChatMessages(userUID: UserData.secondaryUser?.userID ?? "", message: response.allMessageModal));
+      } else if (UserData.userChatMessages.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
+        if (response.allMessageModal.length != UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.length) {
+          UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message = response.allMessageModal;
+        } else if (response.allMessageModal.first.messageStatus !=
+            UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.first.messageStatus) {
+          UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.first = response.allMessageModal.first;
+        }
+      } else {
+        UserData.userChatMessages.add(UserChatMessages(userUID: UserData.secondaryUser?.userID ?? "", message: response.allMessageModal));
+      }
+
+      String savingMsg = jsonEncode(UserData.userChatMessages.map((e) => e.getUserMessages()).toList());
+      SPS.setvalue("user_chat_messages", savingMsg);
+
+      // List<dynamic> returnmsg = jsonDecode(savingMsg);
+
+    }
   }
 
   Future<void> setMessagesCount(String id, int value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setInt(id, value);
+    SPS.setvalue(id, value);
     if (UserData.usersChatCount.isNotEmpty && UserData.usersChatCount.map((e) => e.userUID).toList().contains(UserData.secondaryUser?.userID)) {
       UserData.usersChatCount.firstWhere((e) => (e.userUID == UserData.secondaryUser?.userID)).messageCount = msgLength;
+
+      for (var item in UserData.userChatList) {
+        if (item.userId == UserData.secondaryUser?.userID) {
+          UserChatList msdData = item;
+          msdData.msgCount = msgLength;
+          msdData.seenMsgCount = msgLength;
+          DatabaseMethods().setPrimaryUserMsgCount(msdData);
+        }
+      }
     } else {
       UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", msgLength));
     }
   }
-}
 
-class MessageTile extends StatelessWidget {
-  final String message;
-  final bool sendByMe;
-  final TimeOfDay time;
-  final String? status;
+  void createNewMsg() {
+    if (message.text.isNotEmpty) {
+      MessageModal newMsg = MessageModal(
+          messageContent: message.text,
+          messageFrom: UserData.primaryUser?.userID ?? "",
+          messageTo: UserData.secondaryUser?.userID ?? "",
+          messageType: "TEXT",
+          messageSentTime: DateTime.now().toString(),
+          messageID: "NA",
+          messageSecondaryID: "NA",
+          messageReplayID: "NA",
+          chatType: "INDIVIDUAL",
+          messageStatus: "SENT");
+      message.clear();
+      if (!mounted) return;
+      setState(() {});
+      DatabaseMethods().createMessage(newMsg, (msgLength + 1));
+      setMessagesCount(UserData.secondaryUser?.userID ?? "", msgLength);
+      if (UserData.usersChatCount.isEmpty) {
+        UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
+      } else if (!UserData.usersChatCount.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
+        UserData.usersChatCount.add(UserChatCount(UserData.secondaryUser?.userID ?? "", 1));
+      } else {
+        UserData.usersChatCount.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).messageCount += 1;
+      }
+    }
+  }
 
-  const MessageTile({required this.message, required this.sendByMe, required this.time, this.status, Key? key}) : super(key: key);
+  void appBarFunctions(int index) {
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        bool isForBoth = true;
+        List<String> primIds = List<String>.empty(growable: true);
+        List<String> secIds = List<String>.empty(growable: true);
+        List<MessageModal> lcmessage = UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message;
+        for (var i = 0; i < lcmessage.length; i++) {
+          if (lcmessage.elementAt(i).isSelected) {
+            if (lcmessage.elementAt(i).messageFrom == UserData.secondaryUser?.userID) {
+              isForBoth = false;
+            }
+            primIds.add(queryResponse.elementAt(i).id);
+            secIds.add(lcmessage.elementAt(i).messageSecondaryID);
+          }
+        }
+        UserChatList msdData = UserChatList(
+            userId: UserData.secondaryUser?.userID ?? "",
+            userName: UserData.secondaryUser?.name ?? "",
+            lastMsg: lcmessage.first.messageContent,
+            lastMsgTime: lcmessage.first.messageSentTime,
+            profileImage: UserData.secondaryUser?.profileImage ?? "",
+            msgCount: msgLength,
+            seenMsgCount: msgLength);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return MyAlertBox(
+              onCancle: () {
+                cancleIcon();
+              },
+              deleteForMe: () async {
+                print(primIds);
+                await DatabaseMethods().deleteChatMessages(primIds, secIds, isForBoth);
+                DatabaseMethods().setPrimaryUserMsgCount(msdData);
+                cancleIcon();
+              },
+              deleteForAll: () async {
+                print(primIds);
+                print(secIds);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(top: 8, bottom: 0, left: sendByMe ? 0 : 24, right: sendByMe ? 24 : 0),
-      alignment: sendByMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: sendByMe ? const EdgeInsets.only(left: 30) : const EdgeInsets.only(right: 30),
-        padding: const EdgeInsets.only(top: 17, bottom: 0, left: 20, right: 15),
-        decoration: BoxDecoration(
-            borderRadius: sendByMe
-                ? const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomLeft: Radius.circular(15))
-                : const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
-            color: sendByMe ? Colors.blue : Colors.purple.shade900),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(message,
-                textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'OverpassRegular', fontWeight: FontWeight.w300)),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    DTconversion.timeConversion(time),
-                    style: TextStyle(fontSize: 10, color: sendByMe ? Colors.black : Colors.white),
-                  ),
-                  const SizedBox(width: 3),
-                  if (status != null && sendByMe)
-                    Icon(
-                      status == "SENT" ? Icons.done_rounded : Icons.done_all_rounded,
-                      size: 16,
-                    )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                await DatabaseMethods().deleteChatMessages(primIds, secIds, isForBoth);
+                DatabaseMethods().setPrimaryUserMsgCount(msdData);
+                DatabaseMethods().setSecondaryUserMsgCount(UserData.secondaryUser?.userID ?? "");
+                cancleIcon();
+              },
+            ).deleteMSgAlert(context, isForBoth);
+          },
+        );
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      default:
+        () {};
+    }
+  }
+
+  void cancleIcon() {
+    isMsgSelected = false;
+    if (UserData.userChatMessages.isNotEmpty && UserData.userChatMessages.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
+      for (var i = 0; i < UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.length; i++) {
+        UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.elementAt(i).isSelected = false;
+      }
+      if (!mounted) return;
+      setState(() {});
+    }
   }
 }

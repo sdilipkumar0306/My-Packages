@@ -84,15 +84,15 @@ class _UserChatListUIState extends State<UserChatListUI> {
               backgroundColor: UiConstants.myColor,
               title: Text(
                 UserData.primaryUser?.name ?? UiConstants.appName,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: UiConstants.appBarElementsColor),
               ),
               centerTitle: true,
               actions: [
                 PopupMenuButton(
-                  color: Colors.white,
+                  color: UiConstants.appBarElementsColor,
                   icon: const Icon(
                     Icons.more_vert_rounded,
-                    color: Colors.white,
+                    color: UiConstants.appBarElementsColor,
                   ),
                   itemBuilder: (context) => [
                     PopupMenuItem(
@@ -127,10 +127,7 @@ class _UserChatListUIState extends State<UserChatListUI> {
               ],
               leading: IconButton(
                 onPressed: () {},
-                icon: const Icon(
-                  Icons.menu,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.menu, color: UiConstants.appBarElementsColor),
                 splashRadius: 10,
               ),
             ),
@@ -214,7 +211,13 @@ class _UserChatListUIState extends State<UserChatListUI> {
           UserData.userChatList.firstWhere((e) => e.userId == lUCD.userId).lastMsg = lUCD.lastMsg;
           UserData.userChatList.firstWhere((e) => e.userId == lUCD.userId).lastMsgTime = lUCD.lastMsgTime;
           UserData.userChatList.firstWhere((e) => e.userId == lUCD.userId).msgCount = lUCD.msgCount;
-        } else {}
+        } else {
+          int lcCount = UserData.userChatList.elementAt(i).seenMsgCount;
+          int lcCount2 = UserData.usersChatCount.firstWhere((e) => e.userUID == UserData.userChatList.elementAt(i).userId).messageCount;
+          if (lcCount > lcCount2) {
+            UserData.usersChatCount.firstWhere((e) => e.userUID == UserData.userChatList.elementAt(i).userId).messageCount = lcCount;
+          }
+        }
       }
     }
     if (lcUserChatList.length != UserData.userChatList.length) {
