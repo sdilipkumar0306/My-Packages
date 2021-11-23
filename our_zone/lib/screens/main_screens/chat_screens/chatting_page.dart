@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:our_zone/util/constants/conversion.dart';
 import 'package:our_zone/util/constants/firebase_constants.dart';
+import 'package:our_zone/util/constants/service_constants.dart';
 import 'package:our_zone/util/constants/ui_constants.dart';
 import 'package:our_zone/util/modals/common_modals.dart';
 import 'package:our_zone/util/modals/firebase_modals.dart';
@@ -400,15 +401,18 @@ class _ChatMainUIState extends State<ChatMainUI> {
               },
               deleteForMe: () async {
                 print(primIds);
-                await DatabaseMethods().deleteChatMessages(primIds, secIds, isForBoth);
+                CommonService.closeKeyboard(context);
+
+                await DatabaseMethods().deleteChatMessages(primIds, secIds, false);
                 DatabaseMethods().setPrimaryUserMsgCount(msdData);
                 cancleIcon();
               },
               deleteForAll: () async {
                 print(primIds);
                 print(secIds);
+                CommonService.closeKeyboard(context);
 
-                await DatabaseMethods().deleteChatMessages(primIds, secIds, isForBoth);
+                await DatabaseMethods().deleteChatMessages(primIds, secIds, true);
                 DatabaseMethods().setPrimaryUserMsgCount(msdData);
                 DatabaseMethods().setSecondaryUserMsgCount(UserData.secondaryUser?.userID ?? "");
                 cancleIcon();
@@ -428,6 +432,8 @@ class _ChatMainUIState extends State<ChatMainUI> {
 
   void cancleIcon() {
     isMsgSelected = false;
+    // CommonService.closeKeyboard(context);
+
     if (UserData.userChatMessages.isNotEmpty && UserData.userChatMessages.map((e) => e.userUID).contains(UserData.secondaryUser?.userID)) {
       for (var i = 0; i < UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.length; i++) {
         UserData.userChatMessages.firstWhere((e) => e.userUID == UserData.secondaryUser?.userID).message.elementAt(i).isSelected = false;
