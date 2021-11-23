@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fuse/util/common_utils.dart';
 
 class MainHomePage extends StatefulWidget {
   const MainHomePage({Key? key}) : super(key: key);
@@ -8,11 +9,22 @@ class MainHomePage extends StatefulWidget {
 }
 
 class _MainHomePageState extends State<MainHomePage> {
+  bool isDark = false;
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Text("Home Page"),
+        child: ElevatedButton(
+            onPressed: () {
+              if (isDark) {
+                setAsLight(context);
+              } else {
+                setAsDark(context);
+              }
+              isDark = !isDark;
+              notMounted(mounted, setState);
+            },
+            child: Text(isDark.toString())),
       ),
     );
   }
