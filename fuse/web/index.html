@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -28,32 +29,60 @@
 
   <title>fuse</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    .container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      /* Default Axis is X*/
+      justify-content: center;
+      /* Main Axis */
+      align-items: center;
+      /* Cross Axis */
+    }
+
+    .indicator {
+      width: 50vw;
+    }
+  </style>
+
 </head>
-<body>
+
+<body style="overflow: hidden">
+
+
+  <div id="loading_indicator" class="container">
+    <img class="indicator" src="./assets/loader.gif" />
+  </div>
+
+
+
+
+
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
-       <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
-       <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-core.js"></script>
-       <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
-       <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
-       <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
-       <script type="module">
-     
-        // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-core.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+  <script type="module">
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyDs-vP-IWUCy8reMT3dr2F_3JXtn7f47ts",
-          authDomain: "fuse-b561c.firebaseapp.com",
-          projectId: "fuse-b561c",
-          storageBucket: "fuse-b561c.appspot.com",
-          messagingSenderId: "720734045600",
-          appId: "1:720734045600:web:bb1a83e3a6f796bcab90c5"
-        };
-        firebase.initializeApp(firebaseConfig);
-     
+    // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDs-vP-IWUCy8reMT3dr2F_3JXtn7f47ts",
+      authDomain: "fuse-b561c.firebaseapp.com",
+      projectId: "fuse-b561c",
+      storageBucket: "fuse-b561c.appspot.com",
+      messagingSenderId: "720734045600",
+      appId: "1:720734045600:web:bb1a83e3a6f796bcab90c5"
+    };
+    firebase.initializeApp(firebaseConfig);
+
         // const app = initializeApp(firebaseConfig);
-      </script>
+  </script>
 
 
   <script>
@@ -120,5 +149,16 @@
       loadMainDartJs();
     }
   </script>
+  <script>
+    window.onload = function () {
+      setTimeout(function () {
+        var loadingIndicator = document.getElementById("loading_indicator");
+        if (loadingIndicator) {
+          loadingIndicator.remove();
+        }
+      }, 20000);
+    };
+  </script>
 </body>
+
 </html>
