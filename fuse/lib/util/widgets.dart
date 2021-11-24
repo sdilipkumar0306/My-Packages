@@ -18,6 +18,7 @@ class MyTextField extends StatelessWidget {
   final double? borderRadius;
   final Color? borderColor;
   final OutlineInputBorder? border;
+  final OutlineInputBorder? focusBorder;
   final OutlineInputBorder? errorBorder;
   final InputDecoration? decoration;
   final void Function()? onEditingComplete;
@@ -41,6 +42,7 @@ class MyTextField extends StatelessWidget {
     this.borderRadius,
     this.borderColor,
     this.border,
+    this.focusBorder,
     this.errorBorder,
     this.decoration,
     this.showtext = true,
@@ -70,7 +72,7 @@ class MyTextField extends StatelessWidget {
               fillColor: textFieldColor,
               border: border ?? myOutlineInputBorder(radius: borderRadius, color: borderColor),
               enabledBorder: border ?? myOutlineInputBorder(radius: borderRadius, color: borderColor),
-              focusedBorder: border ?? myOutlineInputBorder(radius: borderRadius, color: borderColor),
+              focusedBorder: focusBorder ?? myOutlineInputBorder(radius: borderRadius, color: borderColor),
               hintText: hintText,
               labelText: lableText,
               hintStyle: myTextStyle(color: textColor),
@@ -88,7 +90,7 @@ class MyTextField extends StatelessWidget {
 
   OutlineInputBorder myOutlineInputBorder({double? radius, Color? color, double? width}) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(radius ?? 25)),
+      borderRadius: BorderRadius.all(Radius.circular(radius ?? 4)),
       borderSide: (color != null)
           ? BorderSide(
               color: color,
