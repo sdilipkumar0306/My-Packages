@@ -2,8 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-import 'pages/home_page_ui.dart';
 import 'pages/login_register/login_register_ui.dart';
 import 'util/theme/theme_manager.dart';
 

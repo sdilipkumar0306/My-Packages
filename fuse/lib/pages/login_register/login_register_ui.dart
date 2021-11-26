@@ -33,7 +33,7 @@ class _LoginRegisterUIState extends State<LoginRegisterUI> {
                     textFieldColor: Colors.cyan.shade900,
                     borderRadius: 5,
                     // lableText: "User Name",
-                    focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: Colors.green)),
+                    focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: const BorderSide(color: Colors.green)),
                     hintText: "Enter Name...",
                     textColor: Colors.white,
                     prefixIcon: const Icon(Icons.person, color: Colors.white),
@@ -50,7 +50,7 @@ class _LoginRegisterUIState extends State<LoginRegisterUI> {
                       textFieldColor: Colors.cyan.shade900,
                       borderRadius: 5,
                       // lableText: "Email",
-                      focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: Colors.green)),
+                      focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: const BorderSide(color: Colors.green)),
                       hintText: "Enter Email...",
                       textColor: Colors.white,
                       prefixIcon: const Icon(Icons.email, color: Colors.white),
@@ -68,7 +68,7 @@ class _LoginRegisterUIState extends State<LoginRegisterUI> {
                       textFieldColor: Colors.cyan.shade900,
                       borderRadius: 5,
                       // lableText: "Password",
-                      focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: Colors.green)),
+                      focusBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: const BorderSide(color: Colors.green)),
                       hintText: "Enter Password...",
                       textColor: Colors.white,
                       prefixIcon: const Icon(Icons.security, color: Colors.white),
@@ -86,7 +86,7 @@ class _LoginRegisterUIState extends State<LoginRegisterUI> {
                     ),
                   if (!enablePassword || !enableEmail)
                     MyButton(
-                      child: MyText("submit"),
+                      child: const MyText("submit"),
                       onPressed: () {
                         if (!enableEmail) {
                           enableEmail = true;
